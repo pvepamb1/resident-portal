@@ -1,0 +1,361 @@
+<title>Tenant Portal Architecture</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600..800&family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400..500&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper: #EFF1EE;
+    --surface: #F8F9F7;
+    --ink: #1B1F23;
+    --ink-soft: #5B6470;
+    --rule: #D7DBD6;
+    --accent: #2B6CB0;
+    --accent-soft: #E4EDF6;
+    --warn: #96690F;
+    --warn-soft: #F5E9D3;
+    --reject: #8C4A3D;
+    --reject-soft: #F1E4DF;
+    --lock: #2F6B4F;
+    --lock-soft: #E1EEE6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper: #14171A;
+      --surface: #1B1F23;
+      --ink: #E6E8E6;
+      --ink-soft: #96A0A8;
+      --rule: #2B3136;
+      --accent: #6FA8DC;
+      --accent-soft: #1E2C38;
+      --warn: #D9A83D;
+      --warn-soft: #332B18;
+      --reject: #C97B6E;
+      --reject-soft: #2E211D;
+      --lock: #6FBE96;
+      --lock-soft: #1C2A22;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper: #14171A;
+    --surface: #1B1F23;
+    --ink: #E6E8E6;
+    --ink-soft: #96A0A8;
+    --rule: #2B3136;
+    --accent: #6FA8DC;
+    --accent-soft: #1E2C38;
+    --warn: #D9A83D;
+    --warn-soft: #332B18;
+    --reject: #C97B6E;
+    --reject-soft: #2E211D;
+    --lock: #6FBE96;
+    --lock-soft: #1C2A22;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Literata", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) 16px 72px;
+    display: flex;
+    justify-content: center;
+  }
+  .page{ width: 100%; max-width: 860px; }
+
+  h1,h2,h3, .eyebrow, .chip, .mono{ font-family: "Archivo", ui-sans-serif, system-ui, sans-serif; }
+  code, .path, .stack-table, .mono-num{ font-family: "JetBrains Mono", ui-monospace, "SF Mono", monospace; }
+
+  header.masthead{ margin-bottom: 28px; }
+  .eyebrow{
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-soft); margin: 0 0 10px;
+  }
+  h1{
+    font-size: clamp(28px, 4.2vw, 38px); font-weight: 800; margin: 0 0 12px;
+    text-wrap: balance; letter-spacing: -0.01em;
+  }
+  .dek{ color: var(--ink-soft); font-size: 17px; max-width: 62ch; margin: 0; }
+
+  nav.toc{
+    margin: 28px 0 36px; padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--rule); border-radius: 6px;
+  }
+  nav.toc .eyebrow{ margin-bottom: 8px; }
+  nav.toc ol{
+    margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 24px;
+    font-size: 14px;
+  }
+  nav.toc li{ break-inside: avoid; margin-bottom: 6px; }
+  nav.toc a{ color: var(--accent); text-decoration: none; }
+  nav.toc a:hover{ text-decoration: underline; }
+
+  .summary-grid{
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+    gap: 10px; margin: 0 0 40px;
+  }
+  .summary-card{
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .summary-card .k{ font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); font-family:"Archivo",sans-serif; font-weight:600; }
+  .summary-card .v{ font-size: 15px; margin-top: 4px; font-weight: 500; }
+
+  section{ margin: 44px 0; scroll-margin-top: 16px; }
+  section h2{
+    font-size: 22px; font-weight: 700; margin: 0 0 6px; text-wrap: balance;
+    padding-bottom: 10px; border-bottom: 2px solid var(--rule);
+  }
+  section h2 .num{ color: var(--accent); font-family:"JetBrains Mono",monospace; font-weight:500; font-size: 15px; margin-right: 8px; }
+  section > p:first-of-type{ margin-top: 16px; }
+  h3{ font-size: 16px; font-weight: 700; margin: 22px 0 8px; }
+
+  .chip{
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 3px 9px; border-radius: 999px; margin: 0 6px 0 0;
+  }
+  .chip--lock{ background: var(--lock-soft); color: var(--lock); }
+  .chip--reject{ background: var(--reject-soft); color: var(--reject); }
+  .chip--warn{ background: var(--warn-soft); color: var(--warn); }
+
+  .trail{ list-style: none; margin: 14px 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .trail li{
+    padding: 12px 16px; border-left: 3px solid var(--rule); background: var(--surface); border-radius: 0 6px 6px 0;
+  }
+  .trail li.win{ border-left-color: var(--lock); }
+  .trail li.out{ border-left-color: var(--reject); }
+  .trail .lead{ font-weight: 600; font-family:"Archivo",sans-serif; font-size: 15px; margin-bottom: 4px; }
+  .trail p{ margin: 0; color: var(--ink-soft); font-size: 15.5px; }
+
+  .callout{
+    border: 1px solid var(--warn); background: var(--warn-soft); border-radius: 6px;
+    padding: 16px 18px; margin: 18px 0;
+  }
+  .callout .eyebrow{ color: var(--warn); }
+  .callout p:last-child{ margin-bottom: 0; }
+
+  .rule-card{
+    border: 1px solid var(--rule); border-radius: 6px; padding: 16px 18px; margin: 14px 0; background: var(--surface);
+  }
+  .rule-card h3{ margin-top: 0; }
+  .rule-card .tag{ font-size: 11px; color: var(--accent); font-weight: 600; }
+
+  table{ border-collapse: collapse; width: 100%; font-size: 15px; }
+  th,td{ text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); }
+  th{ font-family:"Archivo",sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); }
+  .table-wrap{ overflow-x: auto; }
+
+  .diagram-wrap{ margin: 16px 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px; overflow-x: auto; }
+  .diagram-wrap .cap{ font-size: 12px; color: var(--ink-soft); margin: 8px 4px 0; font-family:"Archivo",sans-serif; }
+
+  .deferred-list{ columns: 2; column-gap: 28px; font-size: 15px; }
+  .deferred-list li{ break-inside: avoid; margin-bottom: 10px; color: var(--ink-soft); }
+  .deferred-list li b{ color: var(--ink); }
+
+  footer{ margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--ink-soft); }
+
+  @media (max-width: 620px){
+    nav.toc ol{ columns: 1; }
+    .deferred-list{ columns: 1; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="eyebrow">Architecture walkthrough · resident-portal · v2, full picture</p>
+    <h1>Tenant Portal — how it's built, and why</h1>
+    <p class="dek">The complete picture after two passes: the original architecture session, and a big correction once it became clear the tenant needed a real portal account, not just a payment link. Both folded in as one coherent document.</p>
+  </header>
+
+  <div class="summary-grid">
+    <div class="summary-card"><div class="k">Paradigm</div><div class="v">Hexagonal (ports &amp; adapters)</div></div>
+    <div class="summary-card"><div class="k">Stack</div><div class="v">TypeScript + Next.js 16</div></div>
+    <div class="summary-card"><div class="k">Database</div><div class="v">PostgreSQL 18 · Drizzle ORM</div></div>
+    <div class="summary-card"><div class="k">DB host</div><div class="v">Neon (serverless)</div></div>
+    <div class="summary-card"><div class="k">Gateway</div><div class="v">Razorpay</div></div>
+    <div class="summary-card"><div class="k">Auth</div><div class="v">Better Auth · 3 methods, both sides</div></div>
+    <div class="summary-card"><div class="k">Hosting</div><div class="v">Vercel, scale-to-zero</div></div>
+    <div class="summary-card"><div class="k">Capabilities</div><div class="v">11 (CAP-1 – CAP-11)</div></div>
+  </div>
+
+  <nav class="toc">
+    <p class="eyebrow">On this page</p>
+    <ol>
+      <li><a href="#shape">The shape of the app</a></li>
+      <li><a href="#paradigm">Why hexagonal architecture</a></li>
+      <li><a href="#stack">The stack, and the trail to it</a></li>
+      <li><a href="#hosting">Hosting: Vercel</a></li>
+      <li><a href="#gateway">Gateway: Razorpay</a></li>
+      <li><a href="#database">Database: Postgres + Drizzle + Neon</a></li>
+      <li><a href="#login">Login: the part that changed the most</a></li>
+      <li><a href="#offboarding">Ending a tenancy</a></li>
+      <li><a href="#lifecycle">Refunds, renewals &amp; notifications</a></li>
+      <li><a href="#rules">The money-handling rules</a></li>
+      <li><a href="#protection">Data protection floor</a></li>
+      <li><a href="#deferred">Left open, on purpose</a></li>
+    </ol>
+  </nav>
+
+  <section id="shape">
+    <h2><span class="num">01</span>The shape of the app</h2>
+    <p>A Next.js website — not a native app — where <b>both</b> the landlord and each tenant log into their own persistent portal account. There is no no-login shortcut anywhere in this system. The landlord (just Prasenna, for now — no open sign-up) manages tenants, units, and leases. Each tenant, invited by the landlord, logs in to pay rent, see their payment history, view lease documents, and manage an optional UPI Autopay mandate. Money moves through Razorpay, a licensed gateway — the app never touches or holds funds directly. Data lives in Postgres.</p>
+  </section>
+
+  <section id="paradigm">
+    <h2><span class="num">02</span>Why hexagonal architecture</h2>
+    <p>The core idea: business logic — tracking rent, leases, payments, tenancies — doesn't know or care <em>how</em> money moves, <em>how</em> someone proves who they are, or <em>how</em> a message gets delivered. It talks to those things through defined interfaces (<b>ports</b>); the real connections to Razorpay, the database, the auth provider, and email/SMS each live in a separate, swappable piece (<b>adapters</b>).</p>
+    <p><b>Why it matters concretely:</b> add a second gateway, switch databases, or change how sessions are revoked — rewrite <em>that one piece</em>, not the whole app. It's already paid off once: the tenant-portal correction added a whole new identity-resolution mechanism and a tenancy-lifecycle module without touching the payment core at all.</p>
+    <div class="diagram-wrap">
+      <pre class="mermaid">
+graph LR
+  A1[Razorpay adapter] -->|implements| P1[PaymentGateway port]
+  A2[Drizzle/Postgres adapter] -->|implements| P2[Repository port]
+  A3[Scheduler adapter] -->|implements| P3[JobDispatcher port]
+  A4[Better Auth adapter] -->|implements| P4[Auth port]
+  A5[Email/SMS adapters] -->|implement| P5[Notifier port]
+  C[Core domain<br/>payments, leases, reminders,<br/>autopay, tenancy lifecycle] -->|depends on| P1
+  C -->|depends on| P2
+  C -->|depends on| P3
+  C -->|depends on| P4
+  C -->|depends on| P5
+  APP[Next.js routes] -->|wires| A1
+  APP -->|wires| A2
+  APP -->|wires| A3
+  APP -->|wires| A4
+  APP -->|wires| A5
+  APP -->|calls| C
+      </pre>
+      <p class="cap">Five ports now — Notifier was added when landlord notifications (CAP-11) needed the same "send a message" mechanism tenant reminders already used.</p>
+    </div>
+  </section>
+
+  <section id="stack">
+    <h2><span class="num">03</span>The stack, and everything that didn't make the cut</h2>
+    <p>The deciding factor for the winner wasn't "best language" — it was that Next.js gives <em>one codebase</em> for the tenant-facing pages, the landlord dashboard, and the code that talks to Razorpay. For someone building this solo, not maintaining two separate projects mattered more than any other single factor.</p>
+    <ul class="trail">
+      <li class="win"><div class="lead"><span class="chip chip--lock">Locked</span>TypeScript + Next.js 16 (App Router)</div><p>One codebase for everything. Fastest cold start of any full-stack option without extra engineering, most mainstream ecosystem for AI-authored code to land correctly in.</p></li>
+      <li class="out"><div class="lead"><span class="chip chip--reject">Ruled out</span>Java or Kotlin + Spring Boot</div><p>Your actual professional depth, and Spring's security/data tooling is genuinely excellent. Ruled out because scale-to-zero hosting means a plain JVM app takes ~5–6s to wake from cold — a real delay on every portal open. Fixing that needs GraalVM Native Image, a real build-pipeline tax on top of Spring's reflection-heavy style. AI writing most of the code also weakens "you'd be fastest in Java" as an argument.</p></li>
+      <li class="out"><div class="lead"><span class="chip chip--reject">Ruled out</span>Python (Django / FastAPI)</div><p>No cold-start tax, and Django's free admin panel was a real perk. Ruled out only because it still needs a separate frontend project — the exact two-codebase situation Next.js avoids.</p></li>
+      <li class="out"><div class="lead"><span class="chip chip--reject">Ruled out</span>Go</div><p>Fast, lean, no cold-start issue — but no built-in security/ORM/admin toolkit the way Spring or Django have, and the same two-codebase shape as Python. No distinct edge over Next.js here.</p></li>
+      <li class="out"><div class="lead"><span class="chip chip--reject">Ruled out — the tempting one</span>Rust</div><p>A genuine learning goal, and the fastest cold start of anything on the list. Ruled out for one concrete reason: Razorpay has no official Rust SDK — only a handful of unofficial, mostly stale community crates. Hand-rolling webhook signature verification against an unmaintained package was too much risk for the part of the app where money-correctness is non-negotiable. Verdict: learn Rust on a different, lower-stakes project.</p></li>
+      <li class="out"><div class="lead"><span class="chip chip--reject">Ruled out</span>React Native (native mobile app)</div><p>The pitch was "we could have both, it's still React." In practice RN shares almost nothing with a Next.js codebase — different UI primitives, styling, and separate app-store release pipelines. It would have quietly undone the one-codebase advantage, and nothing in the product needs it: the one place a native app would matter (approving a recurring payment) already happens inside the tenant's own UPI app.</p></li>
+    </ul>
+  </section>
+
+  <section id="hosting">
+    <h2><span class="num">04</span>Hosting: Vercel, and why "free" won over bigger-free</h2>
+    <p>A clear call made early: don't pay for infrastructure you don't need yet, especially before there's evidence anyone besides you wants this. That pointed at <b>scale-to-zero</b> hosting — the app spins down when nobody's using it.</p>
+    <p>Vercel was picked over Cloudflare Pages and Netlify specifically because it supports every Next.js feature natively, zero extra config — meaningful while you're still learning the framework. Cloudflare's free tier is bigger, but needs adapter layers for full Next.js support — a real risk of hitting a confusing compatibility gap mid-build. Reconsider it later, specifically if cost becomes real at meaningfully higher scale.</p>
+  </section>
+
+  <section id="gateway">
+    <h2><span class="num">05</span>Gateway: Razorpay over Cashfree</h2>
+    <p>Both support UPI Autopay. Razorpay has no annual fee; Cashfree charges ₹4,999/year on top of similar transaction fees, and Razorpay is specifically called out industry-wide as the stronger option for subscription/recurring-billing products — exactly what rent collection is.</p>
+  </section>
+
+  <section id="database">
+    <h2><span class="num">06</span>Database: Postgres + Drizzle, hosted on Neon</h2>
+    <p><b>Postgres over the alternatives:</b> MySQL is comparable, but Postgres has a native extension (<code>pgcrypto</code>) that directly serves the PAN-encryption rule below. SQLite doesn't suit a real hosted multi-user product. MongoDB was the real contender to rule out — this app's data is inherently relational (payments belong to leases belong to units belong to landlords, and now refunds belong to payments), and the money-correctness rule leans directly on relational transactions and unique constraints — much harder to hold onto safely in a document store.</p>
+    <p><b>Drizzle over Prisma:</b> both turn code into SQL — the difference is how. Prisma routes every call through a separate engine that has to boot up fresh on every cold start; Drizzle has no such layer, it builds SQL directly. Given how much this hosting setup depends on fast wake-ups, Drizzle stays consistent; Prisma would quietly reintroduce the same cold-start problem that ruled out Java.</p>
+    <p><b>Neon over Supabase, for hosting Postgres itself:</b> a bit of a trick question — Vercel Postgres isn't even a separate product anymore, it was retired and migrated to Neon in December 2024, making Neon the de facto standard for this exact stack. Supabase's free tier fully <em>pauses</em> after 7 days idle, taking 10–30 seconds to wake — worse than the Java cold start that got ruled out — and its bundled extras (auth, storage) go unused since those were already decided separately.</p>
+  </section>
+
+  <section id="login">
+    <h2><span class="num">07</span>Login: the part that changed the most</h2>
+    <p><b>Both the landlord and every tenant have a full, persistent portal account — same weight, no exceptions.</b> This wasn't the original plan. Early on, "no tenant enrollment" (meaning no forced signup step) got misread as "no tenant login at all" — a real correction, since the whole point was always a tenant <em>portal</em>, where they can see anything, anytime.</p>
+    <p><b>Three sign-in methods, no password, for both landlord and tenant:</b> Google OAuth, phone+OTP, or email magic link. Password was considered and excluded — the three passwordless methods already cover every realistic case, and a password adds hashing/reset-flow security surface (a classic attack vector) for no gap it fills.</p>
+    <p><b>How a tenant gets in the first place:</b> the landlord adds a tenant record (name, phone, email, lease) before the tenant ever touches the app, and the system sends a one-time activation invite by email, expiring after a few days. That invite is what makes the whole thing safe — a tenant can't land on the wrong account, because there's no self-service claim step to get wrong.</p>
+    <p><b>How login actually resolves to the right account — the trickiest part:</b> phone+OTP and email magic link are direct matches — if the number or address matches what the landlord has on file, that's it. Google is different: it proves who someone is, but the email tied to it might not match anything on file. In that case, a one-time confirmation of an identifier already on file links the Google identity to the existing record. Every identifier gets <b>normalized first</b> (email lowercased, phone reduced to one standard format) so a formatting difference alone can't cause a legitimate match to silently fail — that gap was caught during the architecture review, not after. This resolution logic is built by the app itself, not left to the auth library's own account-linking feature — Better Auth's built-in cross-provider linking is documented as unreliable, and by default would create a second, disconnected account if the same person used a different method than before.</p>
+    <p><b>The landlord's own login got the same treatment, for a fair reason.</b> It was originally locked as Google-only, back when the mental model was "tenant never logs in, landlord is the only account that matters." Once tenants got three flexible options because not everyone has or wants Google, the same logic applied to the landlord — extending the same three methods was nearly free since the plumbing already had to exist for tenants.</p>
+    <p><b>One boundary: no open landlord sign-up.</b> Access is allowlisted to one specific, pre-configured identity — anyone being able to register and become a landlord would contradict the already-locked "single-landlord POC first" scope. Open registration is a real, later feature, not something this build needs yet.</p>
+    <div class="callout">
+      <p class="eyebrow">Correction made mid-session</p>
+      <p>The library first proposed for this, Auth.js (NextAuth), turned out to be in maintenance mode since early 2026 — its team merged into <b>Better Auth</b> in September 2025, now the standard recommendation for new Next.js projects. The <em>decision</em> — lean on a mature library, not hand-rolled security — didn't change, only the library name.</p>
+    </div>
+  </section>
+
+  <section id="offboarding">
+    <h2><span class="num">08</span>Ending a tenancy — and the security hole a first attempt would have opened</h2>
+    <p>When the landlord ends a tenancy, the former tenant's access needs to be revoked — but there was a real fairness question underneath: shouldn't a former tenant still see their <em>own</em> payment history, for their own records? The first answer ("let them keep logging in, read-only") created a real security hole: if that tenant's phone number or email later gets reassigned to someone else — numbers do get recycled — that new person could authenticate as the "former tenant" and see someone else's private payment and lease history.</p>
+    <p><b>The actual design:</b> ending a tenancy immediately invalidates every active session that tenant has — not just future logins, sessions already in progress — and in that same moment generates a one-time export of their payment history, delivered to them, instead of ongoing access. This requires the auth system to support real, immediate session revocation (a session record the server can actually kill), not a self-contained token that just expires naturally regardless of what the server wants — a requirement the architecture review made explicit rather than leaving implied.</p>
+  </section>
+
+  <section id="lifecycle">
+    <h2><span class="num">09</span>Refunds, renewals &amp; notifications — the rest of a tenancy's real lifecycle</h2>
+    <p>Three more capabilities came out of a deliberate completeness check partway through this session, applying one pattern that kept showing up: nearly every capability described the forward action but not its reverse (invite-but-not-resend, add-but-not-remove, setup-but-not-cancel).</p>
+    <div class="rule-card">
+      <h3>Refunds (CAP-9)</h3>
+      <p>The landlord can refund a payment, in part or in full. A refund can never exceed what was actually paid — enforced as part of the same money-correctness discipline that governs regular payments, checked <em>before</em> the refund request is even sent, not just recorded after. Refund webhooks get redelivered exactly like payment webhooks, so the same duplicate-safe handling applies.</p>
+    </div>
+    <div class="rule-card">
+      <h3>Renewals (CAP-10)</h3>
+      <p>A lease can be renewed under the same tenant account rather than creating a duplicate — and if the rent changes, any active Autopay mandate gets updated or recreated to match, rather than silently continuing to charge the old amount.</p>
+    </div>
+    <div class="rule-card">
+      <h3>Landlord notifications (CAP-11)</h3>
+      <p>The landlord gets notified — email or SMS, never WhatsApp — when a payment comes in, when an autopay charge fails, and when an invited tenant activates their account. Before this, the landlord would have had to keep actively checking the portal to know any of that happened.</p>
+    </div>
+    <div class="diagram-wrap">
+      <pre class="mermaid">
+erDiagram
+  LANDLORD ||--o{ UNIT : owns
+  UNIT ||--o{ LEASE : "rented under"
+  TENANT ||--o{ LEASE : "party to"
+  LEASE ||--o{ PAYMENT : generates
+  PAYMENT ||--o{ REFUND : "may have"
+  LEASE ||--o| AUTOPAY_MANDATE : "may enable"
+  LEASE ||--o{ LEASE_DOCUMENT : attaches
+      </pre>
+      <p class="cap">REFUND joined the entity model once CAP-9 was added — it hangs off PAYMENT, not a standalone concept.</p>
+    </div>
+  </section>
+
+  <section id="rules">
+    <h2><span class="num">10</span>The rules built specifically for real money</h2>
+    <div class="rule-card">
+      <p class="tag">AD-2</p>
+      <h3>Money-correctness and idempotency</h3>
+      <p>Razorpay is always the source of truth. If the same payment or refund notification arrives twice — which does happen with webhooks — the app recognizes it's a duplicate and does nothing the second time. A refund's amount is checked against the original payment <em>before</em> it's sent, not after. And reminders are suppressed only when this specific month's autopay charge actually <b>succeeded</b> — not just because a mandate exists — so a tenant whose autopay fails for a cycle still gets nudged that rent wasn't actually paid. (An earlier version of this rule checked only whether a mandate existed at all, which would have gone silent in exactly the month it mattered most — caught and fixed during a deliberate completeness review before it was built, not after.)</p>
+    </div>
+    <div class="rule-card">
+      <p class="tag">AD-3</p>
+      <h3>Risk-proportional testing and review</h3>
+      <p>Every change needs passing tests before it ships — universal, no exceptions. Code touching payment collection, refunds, or the autopay mandate needs something extra: tests run against Razorpay's real sandbox, plus a dedicated review pass, every time. Everything else just needs the baseline. A bug in a display page is annoying; a bug in payment logic is real money going wrong.</p>
+    </div>
+    <div class="rule-card">
+      <p class="tag">AD-5</p>
+      <h3>Identity resolution across auth methods</h3>
+      <p>The same real person must never end up with two disconnected accounts because they used a different sign-in method than before. Every identifier is normalized before comparison; resolution is built by the app itself, never left to the auth library's own (unreliable) cross-provider linking.</p>
+    </div>
+    <div class="rule-card">
+      <p class="tag">AD-6</p>
+      <h3>Tenancy-end revocation</h3>
+      <p>Ending a tenancy requires a session strategy the server can actually revoke immediately — not a token that just expires on its own schedule. A one-time export replaces ongoing access.</p>
+    </div>
+  </section>
+
+  <section id="protection">
+    <h2><span class="num">11</span>Data protection floor — not the full picture yet</h2>
+    <p>PAN numbers are encrypted at rest, using one designated method — never a second, incompatible one added later by some future feature. Lease documents, and now a former tenant's payment-history export, live behind links that expire and require the right permission, never a public bucket. This is a floor, not the complete picture — India's DPDP Act has bigger questions around consent and how long data can be kept, and this floor is now in <b>active tension</b> with it: the export/history-retention design promises both landlord and tenant a durable record, which could conflict with a future request from either side to have their data deleted. That's flagged, not resolved.</p>
+  </section>
+
+  <section id="deferred">
+    <h2><span class="num">12</span>Left open, on purpose</h2>
+    <ul class="deferred-list">
+      <li><b>The fuller DPDP posture</b> (consent, retention/deletion rights) — bigger than architecture alone decides, and sharper now given the tenancy-end export design.</li>
+      <li><b>Whether a freed phone/email can be reused for a new tenant's record</b> — a data-model question; the impersonation security risk is already closed regardless (no ongoing login is ever granted to an ended tenancy).</li>
+      <li><b>Whether one lease can have multiple tenants</b> (roommates) — never addressed either way; may not apply to this segment.</li>
+      <li><b>A tenant-initiated way to end their own tenancy</b> — currently landlord-only; a weaker, optional finding, not yet decided.</li>
+      <li><b>The tax feature (TDS)</b> — both the simple version (adjusting one payment a year) and the ambitious version (auto-filing government forms, rejected earlier) stay off the roadmap for now.</li>
+      <li><b>What counts as "success"</b> beyond you using it yourself — genuinely undecided on purpose: learn by building, not prove demand first.</li>
+      <li><b>Multiple servers / high-availability infra</b> — skipped deliberately. AD-2's idempotency guarantee means a brief outage doesn't lose or double-process anything — it just catches up.</li>
+      <li><b>Razorpay KYC requirements</b> on Prasenna as payee, and the exact Razorpay SDK version — confirm at implementation time.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Full decision trail: <span class="path">.memlog.md</span> in this folder (spec + architecture, 130+ entries combined). Build contract: <span class="path">ARCHITECTURE-SPINE.md</span>, sibling to this page. Story sequence: <span class="path">stories.yaml</span> in the spec folder.
+  </footer>
+
+</div>

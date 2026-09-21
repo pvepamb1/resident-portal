@@ -1,0 +1,279 @@
+<!doctype html>
+<title>Tenant Portal Forge</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Source+Serif+4:opsz,wght@8..60,300..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper: #E9EDE2;
+    --paper-raised: #F4F6EE;
+    --ink: #1E2420;
+    --ink-soft: #5B6455;
+    --rule: #C7CCB8;
+    --accent: #2E3F7A;
+    --flag: #8A6A1F;
+    --seal: #A6342A;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper: #171B13;
+      --paper-raised: #1E2318;
+      --ink: #E7EAD9;
+      --ink-soft: #9AA48C;
+      --rule: #333B2C;
+      --accent: #8FA0E8;
+      --flag: #D9A83D;
+      --seal: #E2584A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper: #171B13;
+    --paper-raised: #1E2318;
+    --ink: #E7EAD9;
+    --ink-soft: #9AA48C;
+    --rule: #333B2C;
+    --accent: #8FA0E8;
+    --flag: #D9A83D;
+    --seal: #E2584A;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.62;
+    padding: clamp(20px, 5vw, 56px) 16px 64px;
+    display: flex;
+    justify-content: center;
+  }
+
+  h1, h2, .stamp-hardened{ font-family: "Fraunces", Georgia, serif; text-wrap: balance; }
+  .mono, .tag, .meta-line, .path-note, .date-note{
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  .sheet{
+    width: 100%;
+    max-width: 720px;
+    position: relative;
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: clamp(24px, 4vw, 52px) clamp(20px, 5vw, 56px) 40px;
+    box-shadow: 0 1px 0 var(--rule);
+  }
+  .sheet::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+  }
+
+  .masthead{ position: relative; padding-bottom: 22px; border-bottom: 1px solid var(--rule); }
+  .meta-line{
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-soft); margin: 0 0 10px;
+  }
+  h1{
+    font-size: clamp(28px, 4.4vw, 40px);
+    font-weight: 600;
+    font-optical-sizing: auto;
+    margin: 0 0 12px;
+    max-width: 15ch;
+  }
+  .subtitle{
+    color: var(--ink-soft);
+    font-size: 16px;
+    max-width: 58ch;
+    margin: 0;
+    padding-right: 150px;
+  }
+
+  .stamp-wrap{
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    width: 168px;
+    filter: drop-shadow(0 1px 0.5px rgba(0,0,0,0.06));
+  }
+  .stamp-hardened text{ font-family: "IBM Plex Mono", monospace; }
+  .stamp-center{
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+  }
+
+  section{ margin-top: 34px; }
+  section > h2{
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin: 0 0 14px;
+    color: var(--ink);
+  }
+  .lead{
+    font-size: 18px;
+    max-width: 62ch;
+    margin: 18px 0 0;
+  }
+
+  .entries{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .entries li{
+    display: grid;
+    grid-template-columns: 74px 1fr;
+    gap: 14px;
+    padding: 11px 0;
+    border-top: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .entries li:last-child{ border-bottom: 1px solid var(--rule); }
+  .tag{
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-top: 2px;
+  }
+  .entries--cut .tag{ color: var(--ink-soft); }
+  .entries--open .tag{ color: var(--flag); }
+  .entries--cut li p{ color: var(--ink-soft); }
+  .entries--cut li p .struck{ text-decoration: line-through; text-decoration-color: var(--rule); }
+  .entries li p{ margin: 0; }
+  .entries li p b{ font-weight: 600; color: var(--ink); }
+
+  .panel-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .examiner{
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 16px 18px;
+    background: color-mix(in srgb, var(--paper) 55%, var(--paper-raised));
+  }
+  .examiner .who{
+    display: flex; align-items: baseline; gap: 8px;
+    margin: 0 0 6px;
+  }
+  .examiner .icon{ font-size: 18px; }
+  .examiner .name{ font-weight: 600; font-family: "Fraunces", serif; font-size: 17px; }
+  .examiner .title{ color: var(--ink-soft); font-size: 13px; }
+  .examiner p{ margin: 0; font-size: 15px; color: var(--ink-soft); }
+
+  footer{
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .path-note{ font-size: 12px; color: var(--ink-soft); margin: 0; }
+  .date-note{ font-size: 12px; color: var(--ink-soft); margin: 0; }
+
+  @media (max-width: 560px){
+    .subtitle{ padding-right: 0; }
+    .stamp-wrap{ position: static; margin: 18px auto 0; width: 140px; }
+    .masthead{ padding-bottom: 18px; }
+    .entries li{ grid-template-columns: 62px 1fr; }
+  }
+</style>
+
+<div class="sheet">
+
+  <header class="masthead">
+    <p class="meta-line">Case file · Idea Forge · Two sessions, 10–11 Sep 2026</p>
+    <h1>Tenant &amp; Rental Payment Portal</h1>
+    <p class="subtitle">A landlord–tenant rent payment app for India's 1–5 unit landlords, forged from a single-tenant personal itch into a scoped, buildable POC.</p>
+    <div class="stamp-wrap">
+      <svg class="stamp-hardened" viewBox="0 0 220 220" role="img" aria-label="Outcome: Hardened, sealed 11 September 2026">
+        <g transform="rotate(-9 110 110)">
+          <circle cx="110" cy="110" r="98" fill="none" stroke="var(--seal)" stroke-width="2.5"/>
+          <circle cx="110" cy="110" r="88" fill="none" stroke="var(--seal)" stroke-width="1.2"/>
+          <path id="ringTop" d="M 110,110 m -78,0 a 78,78 0 1,1 156,0" fill="none"/>
+          <path id="ringBottom" d="M 110,110 m -78,0 a 78,78 0 1,0 156,0" fill="none"/>
+          <text font-size="10.5" letter-spacing="2.5" fill="var(--seal)">
+            <textPath href="#ringTop" startOffset="50%" text-anchor="middle">IDEA FORGE · SESSION SEALED</textPath>
+          </text>
+          <text font-size="10.5" letter-spacing="2.5" fill="var(--seal)">
+            <textPath href="#ringBottom" startOffset="50%" text-anchor="middle">11 SEP 2026 · CHENNAI</textPath>
+          </text>
+          <text x="110" y="103" text-anchor="middle" class="stamp-center" font-size="27" fill="var(--seal)">HARDENED</text>
+          <line x1="66" y1="118" x2="154" y2="118" stroke="var(--seal)" stroke-width="1"/>
+          <text x="110" y="134" text-anchor="middle" font-size="9" letter-spacing="1.5" fill="var(--seal)">BUILD, DON'T PROVE FIRST</text>
+        </g>
+      </svg>
+    </div>
+  </header>
+
+  <p class="lead">
+    Started as "manage my rent" for one flat in Chennai and a rent already moving by bank transfer.
+    Under questioning, that turned out to be a product-building goal wearing a personal-pain costume — the
+    real target became India's 1–5 unit landlords, with the user's own tenancy kept only as the dogfood case.
+    What follows is what survived that questioning, what got cut, and what's still open on purpose.
+  </p>
+
+  <section class="ledger">
+    <h2>What's locked</h2>
+    <ol class="entries entries--lock">
+      <li><span class="tag">Scope</span><p><b>Individual landlord–tenant only</b> — gated-community / society management explicitly ruled out.</p></li>
+      <li><span class="tag">Build</span><p><b>Single-landlord POC first</b>, payment module kept isolated — productizing later means rewriting one layer, not the app.</p></li>
+      <li><span class="tag">Driver</span><p><b>This is a product-building goal</b>, not personal pain relief — the user's own 1-tenant case is dogfood, not the target.</p></li>
+      <li><span class="tag">Segment</span><p><b>1–5 unit landlords only</b> — large multi-unit portfolios are an explicit stretch goal, not a design constraint.</p></li>
+      <li><span class="tag">Payments</span><p><b>Pure orchestration on a licensed gateway</b> (Razorpay/Cashfree-class) — the app never custodies funds, so no RBI Payment Aggregator license burden.</p></li>
+      <li><span class="tag">Auto-pay</span><p><b>UPI Autopay mandate ships in v1</b> — the tap-to-confirm step happens inside the tenant's own UPI app via NPCI push, so a website is enough.</p></li>
+      <li><span class="tag">Tax</span><p><b>TDS mechanics resolved:</b> Sec 194-IB is a once-a-year lump deduction on the final payment, not monthly — a calculate-and-adjust feature is real but post-MVP.</p></li>
+      <li><span class="tag">Money</span><p><b>Free-tier guardrail:</b> whoever is on the product when a paid tier launches stays free — no retroactive paywalling of early beta users.</p></li>
+    </ol>
+  </section>
+
+  <section class="ledger">
+    <h2>What didn't survive</h2>
+    <ol class="entries entries--cut">
+      <li><span class="tag">Cut</span><p><span class="struck">Gated-community / society management</span> — different problem, different buyer, dropped at the door.</p></li>
+      <li><span class="tag">Cut</span><p><span class="struck">Free hobbyist base as a credibility signal to large landlords</span> — large multi-unit landlords and small hobbyists are different buyers with different trust signals; the story didn't hold.</p></li>
+      <li><span class="tag">Cut</span><p><span class="struck">Large multi-unit portfolios as the primary target</span> — demoted to stretch goal; a separate app gets built later if scaling ever demands it.</p></li>
+      <li><span class="tag">Cut</span><p><span class="struck">Auto-filing Form 26QC / issuing Form 16C on the tenant's behalf</span> — the compliance relief lands on the tenant, not the paying landlord, and e-filing automation is unverified. Downgraded to a backlog research question.</p></li>
+    </ol>
+  </section>
+
+  <section class="ledger">
+    <h2>Still open — carried forward on purpose</h2>
+    <ol class="entries entries--open">
+      <li><span class="tag">Open</span><p>Whether landlords <i>other than the user</i> feel this problem enough to switch off a spreadsheet — never tested. Accepted as something to learn by shipping, not prove in advance.</p></li>
+      <li><span class="tag">Open</span><p>"A free user base becomes publicity for a paid tier" — still an unproven mechanism, knowingly left unvalidated.</p></li>
+      <li><span class="tag">Open</span><p>UPI Autopay's current AFA threshold and mandate rules — needs verifying against the chosen gateway's actual docs before build, not just against memory of the rule.</p></li>
+      <li><span class="tag">Open</span><p>PAN capture and PAN–Aadhaar link validation for correct TDS withholding — noted, not designed; fine for now since it rides on the post-MVP tax work.</p></li>
+    </ol>
+  </section>
+
+  <section class="examiners">
+    <h2>Who pressure-tested this</h2>
+    <div class="panel-grid">
+      <div class="examiner">
+        <p class="who"><span class="icon">📊</span><span class="name">Mary</span><span class="title">— Business Analyst</span></p>
+        <p>Pushed past "out of scope for the POC" to ask what the payment-history data model silently assumed — first to name the gross-vs-net rent mismatch.</p>
+      </div>
+      <div class="examiner">
+        <p class="who"><span class="icon">🧾</span><span class="name">Raghav</span><span class="title">— Tax CA (invented)</span></p>
+        <p>Walked the Sec 194-IB mechanics in real rupees — deduction timing, PAN penalties, and why "hassle-free filing" is a harder promise than it sounds.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="path-note">Full record: _bmad-output/forge/tenant-portal/.memlog.md · Brief: forged-idea.md</p>
+    <p class="date-note">Sealed 11 Sep 2026</p>
+  </footer>
+
+</div>

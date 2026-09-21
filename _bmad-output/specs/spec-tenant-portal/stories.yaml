@@ -1,0 +1,113 @@
+- id: "1"
+  title: Landlord setup
+  description: >-
+    Implement CAP-7: the one allowlisted landlord logs in (Google OAuth,
+    phone+OTP, or email magic link) and adds, updates, and manages tenant
+    records, units, and lease details, including resending an expired
+    invitation. No open self-service landlord registration.
+  spec_checkpoint: true
+  done_checkpoint: true
+
+- id: "2"
+  title: End tenancy and revoke access
+  description: >-
+    Implement CAP-8: landlord ends a lease, immediately invalidating the
+    former tenant's active sessions. A one-time export/snapshot of their
+    own payment history is generated at that moment, not ongoing login
+    access. Landlord's own historical records are unaffected.
+  spec_checkpoint: true
+  done_checkpoint: true
+
+- id: "3"
+  title: Tenant invitation and login
+  description: >-
+    Implement CAP-6: tenant activates a persistent portal account from a
+    landlord-sent invitation, then authenticates via Google OAuth,
+    phone+OTP, or email magic link. See tenant-auth-onboarding.md closely
+    -- the identity-resolution logic (matching against on-file phone/email,
+    not relying on the auth library's own account linking) is the
+    load-bearing part, not just wiring up three sign-in buttons.
+  spec_checkpoint: true
+  done_checkpoint: true
+
+- id: "4"
+  title: Payment history and lease documents
+  description: >-
+    Implement CAP-3 (landlord per-unit and aggregate portfolio views, tenant's
+    own view, pending-vs-completed distinction) and CAP-4 (lease document
+    upload and tenant access).
+  spec_checkpoint: true
+  done_checkpoint: true
+
+- id: "5"
+  title: Reminders
+  description: >-
+    Implement the reminder half of CAP-2: scheduling and sending the
+    due-date notification (email/SMS, never WhatsApp), suppressed only when
+    this cycle's Autopay auto-debit has actually succeeded -- not merely
+    because a mandate exists.
+  spec_checkpoint: true
+  done_checkpoint: true
+
+- id: "6"
+  title: Portal payment against a fake gateway
+  description: >-
+    Implement the payment half of CAP-2 plus CAP-1's core logic against a
+    FakePaymentGateway adapter behind the existing PaymentGateway port. Do
+    not touch Razorpay directly here -- that's the next story.
+  spec_checkpoint: true
+  done_checkpoint: true
+
+- id: "7"
+  title: Swap in real Razorpay
+  description: >-
+    Harden CAP-1: replace the fake adapter with the real Razorpay
+    integration -- order creation, webhook handling, idempotent recording.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    AFA threshold confirmed at ~Rs 15,000 -- handle the above-threshold
+    PIN-approval case. Full AD-3 gate applies: tests against Razorpay's
+    real sandbox via the shared fixture, plus code-review/security-review
+    before shipping.
+
+- id: "8"
+  title: Refund
+  description: >-
+    Implement CAP-9: landlord issues a partial or full refund through
+    Razorpay, reflected accurately in both landlord and tenant payment
+    history views.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Enforce the refund cap (SPEC.md Constraints) -- a refund can never
+    exceed the amount originally paid. Full AD-3 gate applies, same as the
+    payment-collection stories.
+
+- id: "9"
+  title: UPI Autopay mandate
+  description: >-
+    Implement CAP-5: tenant sets up a recurring UPI Autopay mandate
+    (tap-to-confirm in their own UPI app) and can cancel an active one,
+    with no orphaned mandate left active on Razorpay's side.
+  spec_checkpoint: true
+  done_checkpoint: true
+
+- id: "10"
+  title: Renew a lease
+  description: >-
+    Implement CAP-10: landlord renews an existing tenant's lease for a new
+    term under the same account, preserving payment-history continuity.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    If rent changes, update or recreate the Autopay mandate from Story 9 --
+    don't leave it pointing at the old amount.
+
+- id: "11"
+  title: Landlord notifications
+  description: >-
+    Implement CAP-11: landlord is notified (email/SMS, never WhatsApp) on
+    payment received, autopay failure, and tenant activation.
+  spec_checkpoint: true
+  done_checkpoint: true
