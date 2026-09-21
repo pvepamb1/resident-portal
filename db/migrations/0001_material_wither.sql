@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "tenants_email_unique" ON "tenants" USING btree ("email");
