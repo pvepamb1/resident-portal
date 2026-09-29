@@ -7,7 +7,7 @@ paradigm: hexagonal (ports-and-adapters)
 scope: 'Tenant & rental payment portal (SPEC-tenant-portal) -- the whole POC, all 11 capabilities'
 status: final
 created: '2026-09-11'
-updated: '2026-09-20'
+updated: '2026-09-28'
 binds: [CAP-1, CAP-2, CAP-3, CAP-4, CAP-5, CAP-6, CAP-7, CAP-8, CAP-9, CAP-10, CAP-11]
 sources: [_bmad-output/specs/spec-tenant-portal/SPEC.md]
 companions: []
@@ -68,7 +68,7 @@ graph LR
 
 - **Binds:** all (any code storing PAN numbers or lease documents)
 - **Prevents:** PAN numbers or lease documents being exposed via logs, a public bucket, or an unauthenticated URL.
-- **Rule:** PAN numbers are encrypted at rest and never written to any log line, using one designated application-level encryption mechanism and key-management approach (single key/keyring, defined once in `adapters/db/`) — no adapter or future feature (e.g. the deferred TDS work) may introduce a second, incompatible encryption scheme for the same field type. Lease documents and CAP-8's payment-history exports live in access-controlled object storage behind signed, time-expiring URLs — never a public bucket. This is a technical floor only; it does not by itself satisfy the full DPDP Act, 2023 posture (see Deferred).
+- **Rule:** PAN numbers are encrypted at rest and never written to any log line, using one designated application-level encryption mechanism and key-management approach (single key/keyring, defined once in `adapters/db/`) — no adapter or future feature (e.g. the deferred TDS work) may introduce a second, incompatible encryption scheme for the same field type. Lease documents and CAP-8's payment-history exports live in access-controlled (private) object storage — never a public bucket. Lease documents are served behind signed, time-expiring URLs; CAP-8 exports are never served by URL at all (see AD-6). The object-storage credential is scoped to the one bucket with object read/write only. This is a technical floor only; it does not by itself satisfy the full DPDP Act, 2023 posture (see Deferred).
 
 ### AD-5 — Identity resolution across auth methods [ADOPTED]
 
@@ -80,7 +80,7 @@ graph LR
 
 - **Binds:** CAP-8
 - **Prevents:** a former tenant retaining live access via an already-issued session or token after their tenancy ends, because "revoke access" was implemented as only blocking new logins rather than invalidating existing sessions — a common real bug with session/JWT-based auth that doesn't automatically revoke on a disabled flag.
-- **Rule:** ending a tenancy immediately invalidates all of that tenant's active sessions (explicit session revocation, checked on every request, not just re-evaluated at next login) and, in the same operation, generates a point-in-time export of their payment history for that tenancy. This requires the `Auth` adapter to use a session strategy capable of live server-side revocation (a stateful/DB-backed session record checked per request) — a stateless, self-contained token re-validated only at its own expiry cannot actually be revoked immediately, so that shape of session is not permitted here regardless of which auth provider is wired in. The export is stored via the same object-storage-behind-signed-URL pattern AD-4 uses for lease documents, and its link is delivered through the `Notifier` port. No ongoing login is ever granted to an ended tenancy — only the one-time export — because a phone number or email freed by offboarding could later be reassigned to someone else, and an ongoing login would let that new person impersonate the former tenant.
+- **Rule:** ending a tenancy immediately invalidates all of that tenant's active sessions (explicit session revocation, checked on every request, not just re-evaluated at next login) and, in the same operation, generates a point-in-time export of their payment history for that tenancy. This requires the `Auth` adapter to use a session strategy capable of live server-side revocation (a stateful/DB-backed session record checked per request) — a stateless, self-contained token re-validated only at its own expiry cannot actually be revoked immediately, so that shape of session is not permitted here regardless of which auth provider is wired in. The export is generated once per lease and never regenerated, stored in the same private object storage AD-4 uses for lease documents, and delivered through the `Notifier` port as an email attachment only — never as a download link, since a forwarded link would be a bearer credential for the tenant's financial data. A landlord-triggered re-send delivers the same stored snapshot. Lease-end, pending-invitation invalidation and session deletion commit as one atomic write; a later export or email failure never rolls back access removal. The core `resolveTenantAccess` check is the access guarantee that every tenant request must pass; session deletion only shortens the window. No ongoing login is ever granted to an ended tenancy — only the one-time export — because a phone number or email freed by offboarding could later be reassigned to someone else, and an ongoing login would let that new person impersonate the former tenant.
 
 ## Consistency Conventions
 
@@ -103,6 +103,7 @@ graph LR
 | Better Auth | 1.6+ (May 2026) |
 | Razorpay | REST API + official Node SDK, webhook-driven — no version pin (see Deferred: exact SDK version to confirm at implementation time) |
 | Vercel | hosting / deployment platform, scale-to-zero |
+| Cloudflare R2 | private object storage (AD-4, AD-6) via its S3-compatible API and `@aws-sdk/client-s3` 3.1142.0; no India data residency, accepted for the POC (AWS S3 Mumbai is the migration path) |
 
 ## Structural Seed
 
@@ -185,7 +186,6 @@ resident-portal/
 
 ## Deferred
 
-- **Export file format** (CSV, PDF, or JSON for CAP-8's payment-history export) — not architecturally significant; decide at implementation time.
 - **Exact Razorpay Node SDK version** — confirm at implementation time against Razorpay's current docs, alongside the UPI Autopay AFA threshold verification SPEC.md already requires.
 - **TDS (Sec 194-IB) Tier A calculation** — deferred post-MVP per SPEC.md; will need its own port/adapter thought when it's built (likely a new adapter under `core/payments/`, not a new paradigm).
 - **TDS Tier B (auto-filing)** — downgraded to backlog research in SPEC.md; not architected here.
