@@ -1,3 +1,5 @@
+import { escapeHtml } from '@/core/shared/escape-html';
+
 /**
  * The invitation *email* content -- token, expiry framing, delivery -- is
  * this story's job. The /invite/[token] activation page it links to does
@@ -25,13 +27,4 @@ export function buildInvitationEmail(input: {
     <p>This link expires in a few days and can only be used once.</p>
   `.trim();
   return { subject, html, text };
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
