@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Direction: Verandah Ledger — Resident Portal</title>
+<style>
+/*
+  DIRECTION: Verandah Ledger (boutique heritage brand, wordmark/logotype)
+  ------------------------------------------------------------------
+  LOCKED TOKENS (unchanged across all directions):
+    light  bg #F6F5EF  surface #FFFFFF  text #1E2A22  text2 #5C6B60
+           primary #0E6E5A  success #3E8E4F  warning #B8860B  danger #A13B2E  border #DCE0D3
+    dark   bg #101713  surface #18221C  text #EAF0E9  text2 #A6B7AC
+           primary #3FBF9A  success #6FCB80  warning #D9A93F  danger #E28870  border #2A3830
+
+  DIRECTION-SPECIFIC DECISIONS:
+    type      : serif headlines (Georgia/"Iowan Old Style", system-safe) + sans body,
+                large confident scale for the wordmark (26px) and section titles (20px)
+    density   : airy — 28px card padding, 18px row padding, generous line-height
+    radius    : soft/rounded — 18px cards, 999px pills for badges/buttons, 12px inputs
+    motion    : implied liveliness via a warm hover glow + a small ink-underline sketch
+                on row hover (pure :hover CSS, no JS)
+    register  : boutique, family-run estate — a monogram mark + logotype + tagline,
+                thin gold hairline rules, small line-art motifs (leaf glyphs)
+    spacing   : base unit 8px (rows use 2.5x = 20px vertical rhythm)
+*/
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:40px 24px 80px; background:#EDEAE0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:#1E2A22;
+}
+h1.page-title{font-family:Georgia,"Iowan Old Style",serif; font-size:28px; margin:0 0 6px;}
+.rationale{max-width:880px; font-size:15px; line-height:1.6; color:#3c463f; margin:0 0 40px;}
+.section-label{font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:#6b7a70; margin:48px 0 14px; font-weight:600;}
+.stack{display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start;}
+
+/* ---------- theme variable scopes ---------- */
+.theme-light{
+  --bg:#F6F5EF; --surface:#FFFFFF; --text:#1E2A22; --text2:#5C6B60;
+  --primary:#0E6E5A; --success:#3E8E4F; --warning:#B8860B; --danger:#A13B2E; --border:#DCE0D3;
+  --success-tint:#E8F3EA; --warning-tint:#FBF2DE; --danger-tint:#F7E7E3; --primary-tint:#E4F1EC;
+}
+.theme-dark{
+  --bg:#101713; --surface:#18221C; --text:#EAF0E9; --text2:#A6B7AC;
+  --primary:#3FBF9A; --success:#6FCB80; --warning:#D9A93F; --danger:#E28870; --border:#2A3830;
+  --success-tint:#1C2D20; --warning-tint:#2E2718; --danger-tint:#301E1A; --primary-tint:#152420;
+}
+
+/* ---------- browser frame (hero) ---------- */
+.browser-frame{
+  width:960px; max-width:100%; border-radius:18px; overflow:hidden;
+  border:1px solid var(--border); box-shadow:0 18px 40px -18px rgba(20,30,20,.25);
+  background:var(--bg);
+}
+.browser-chrome{
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.dots{display:flex; gap:6px;}
+.dots span{width:10px; height:10px; border-radius:50%; background:var(--border);}
+.addr{flex:1; background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:12px; color:var(--text2);}
+
+.app{padding:32px 36px 40px; background:var(--bg);}
+.topbar{display:flex; align-items:center; justify-content:space-between; padding-bottom:22px; border-bottom:1px solid var(--border); margin-bottom:28px;}
+.wordmark{display:flex; align-items:center; gap:14px;}
+.mark{
+  width:44px; height:44px; border-radius:50%; border:1.5px solid var(--primary); color:var(--primary);
+  display:flex; align-items:center; justify-content:center; font-family:Georgia,serif; font-size:20px; flex:none;
+}
+.word{font-family:Georgia,"Iowan Old Style",serif; font-size:24px; letter-spacing:.01em; color:var(--text);}
+.tagline{font-size:12px; color:var(--text2); letter-spacing:.04em; margin-top:2px;}
+.owner-chip{display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text2);}
+.owner-chip .av{width:32px; height:32px; border-radius:50%; background:var(--primary-tint); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; font-family:Georgia,serif;}
+
+.section-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:20px;}
+.section-head h2{font-family:Georgia,"Iowan Old Style",serif; font-size:21px; margin:0 0 4px; color:var(--text); font-weight:400;}
+.section-head p{margin:0; font-size:13px; color:var(--text2);}
+
+.btn{
+  border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:600;
+  border-radius:999px; padding:11px 22px; display:inline-flex; align-items:center; gap:8px;
+  transition:box-shadow .18s ease, transform .18s ease;
+}
+.btn-primary{background:var(--primary); color:#fff;}
+.btn-primary:hover{box-shadow:0 6px 18px -6px var(--primary); transform:translateY(-1px);}
+.btn-ghost{background:transparent; border:1px solid var(--border); color:var(--text);}
+.btn-icon{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--surface);
+  color:var(--text2); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:border-color .18s ease, color .18s ease;
+}
+.btn-icon:hover{border-color:var(--primary); color:var(--primary);}
+
+.tenant-card{background:var(--surface); border:1px solid var(--border); border-radius:18px; overflow:hidden;}
+.tenant-row{
+  display:grid; grid-template-columns:auto 1.6fr 1fr 1fr auto; align-items:center; gap:18px;
+  padding:20px 24px; border-bottom:1px solid var(--border); position:relative;
+}
+.tenant-row:last-child{border-bottom:none;}
+.tenant-row:hover{background:var(--primary-tint);}
+.tenant-row:hover .name::after{transform:scaleX(1);}
+.avatar{width:42px; height:42px; border-radius:50%; background:var(--primary-tint); color:var(--primary); display:flex; align-items:center; justify-content:center; font-family:Georgia,serif; font-size:16px; font-weight:600;}
+.who .name{font-size:15px; font-weight:600; color:var(--text); position:relative; display:inline-block;}
+.who .name::after{content:""; position:absolute; left:0; bottom:-3px; width:100%; height:1px; background:var(--primary); transform:scaleX(0); transform-origin:left; transition:transform .25s ease;}
+.who .unit{font-size:13px; color:var(--text2); margin-top:3px;}
+.rent{font-size:15px; color:var(--text); font-variant-numeric:tabular-nums;}
+.rent .per{font-size:12px; color:var(--text2);}
+.badge{display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; font-size:12.5px; font-weight:600;}
+.badge svg{width:13px; height:13px;}
+.badge.completed{background:var(--success-tint); color:var(--success);}
+.badge.pending{background:var(--warning-tint); color:var(--warning);}
+.badge.invited{background:var(--primary-tint); color:var(--primary);}
+.badge.overdue{background:var(--danger-tint); color:var(--danger);}
+.actions{display:flex; gap:8px; justify-content:flex-end;}
+
+/* ---------- phone frame (secondary) ---------- */
+.phone-frame{
+  width:320px; border-radius:34px; border:1px solid var(--border); overflow:hidden;
+  box-shadow:0 18px 40px -18px rgba(20,30,20,.28); background:var(--bg);
+}
+.phone-notch{height:26px; background:var(--surface); display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--border);}
+.phone-notch .pill{width:70px; height:6px; border-radius:4px; background:var(--border);}
+.phone-body{padding:22px 18px 26px;}
+.phone-head{font-family:Georgia,"Iowan Old Style",serif; font-size:19px; color:var(--text); margin-bottom:2px;}
+.phone-sub{font-size:12.5px; color:var(--text2); margin-bottom:20px;}
+.due-card{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:20px; text-align:center; margin-bottom:20px;}
+.due-label{font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--text2); margin-bottom:8px;}
+.due-amount{font-family:Georgia,serif; font-size:32px; color:var(--text); margin-bottom:6px;}
+.due-date{font-size:13px; color:var(--text2); margin-bottom:16px;}
+.status-pill{display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius:999px; font-size:13.5px; font-weight:700; margin-bottom:16px;}
+.status-pill.unpaid{background:var(--warning-tint); color:var(--warning);}
+.status-pill svg{width:15px; height:15px;}
+.pay-btn{width:100%; padding:14px; border-radius:999px; border:none; background:var(--primary); color:#fff; font-size:15px; font-weight:700; cursor:pointer;}
+.hist-title{font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--text2); margin:22px 0 10px;}
+.hist-row{display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border);}
+.hist-row:last-child{border-bottom:none;}
+.hist-month{font-size:13.5px; color:var(--text); font-weight:600;}
+.hist-amt{font-size:12px; color:var(--text2);}
+.hist-status{display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700;}
+.hist-status.paid{color:var(--success);}
+.hist-status svg{width:13px; height:13px;}
+
+.variant-card{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:26px; width:420px; max-width:100%;}
+.variant-title{font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--text2); margin-bottom:14px; font-weight:700;}
+.empty-state{text-align:center; padding:20px 10px;}
+.empty-mark{width:52px; height:52px; margin:0 auto 14px; border-radius:50%; border:1.5px dashed var(--border); display:flex; align-items:center; justify-content:center; color:var(--text2); font-family:Georgia,serif; font-size:22px;}
+.empty-state h3{font-family:Georgia,serif; font-weight:400; font-size:17px; margin:0 0 6px; color:var(--text);}
+.empty-state p{font-size:13px; color:var(--text2); margin:0 0 18px;}
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Direction 1 — Verandah Ledger</h1>
+<p class="rationale">A boutique, family-run register: a serif logotype and monogram, generous air between rows, and soft rounded edges evoke a ledger kept by hand for decades rather than a startup dashboard. A gentle ink-underline sketch on hover and a warm tinted highlight imply an attentive, present landlord without ever raising the volume of the interface.</p>
+
+<div class="section-label">Hero — Landlord Dashboard · Light</div>
+<div class="browser-frame theme-light">
+  <div class="browser-chrome">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="addr">residentportal.app/dashboard</div>
+  </div>
+  <div class="app">
+    <div class="topbar">
+      <div class="wordmark">
+        <div class="mark">R</div>
+        <div>
+          <div class="word">Resident Portal</div>
+          <div class="tagline">Proprietor-managed residences</div>
+        </div>
+      </div>
+      <div class="owner-chip"><div class="av">PV</div> Prasenna Venkatesh</div>
+    </div>
+
+    <div class="section-head">
+      <div>
+        <h2>Tenants</h2>
+        <p>4 residences under management</p>
+      </div>
+      <button class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add tenant
+      </button>
+    </div>
+
+    <div class="tenant-card">
+      <div class="tenant-row">
+        <div class="avatar">RK</div>
+        <div class="who"><div class="name">Ramesh Kumar</div><div class="unit">Unit 2B</div></div>
+        <div class="rent">₹18,500 <span class="per">/mo</span></div>
+        <div><span class="badge pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Pending</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar">AS</div>
+        <div class="who"><div class="name">Anita Sharma</div><div class="unit">Unit 1A</div></div>
+        <div class="rent">₹22,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar">VN</div>
+        <div class="who"><div class="name">Vikram Nair</div><div class="unit">Unit 3C</div></div>
+        <div class="rent">₹15,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar">SI</div>
+        <div class="who"><div class="name">Suresh Iyer</div><div class="unit">Unit 4B</div></div>
+        <div class="rent">₹20,000 <span class="per">/mo</span></div>
+        <div><span class="badge invited"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>Invited · Pending activation</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Resend invitation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></div>
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">Hero — Landlord Dashboard · Dark</div>
+<div class="browser-frame theme-dark">
+  <div class="browser-chrome">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="addr">residentportal.app/dashboard</div>
+  </div>
+  <div class="app">
+    <div class="topbar">
+      <div class="wordmark">
+        <div class="mark">R</div>
+        <div>
+          <div class="word">Resident Portal</div>
+          <div class="tagline">Proprietor-managed residences</div>
+        </div>
+      </div>
+      <div class="owner-chip"><div class="av">PV</div> Prasenna Venkatesh</div>
+    </div>
+    <div class="section-head">
+      <div><h2>Tenants</h2><p>4 residences under management</p></div>
+      <button class="btn btn-primary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add tenant</button>
+    </div>
+    <div class="tenant-card">
+      <div class="tenant-row">
+        <div class="avatar">RK</div>
+        <div class="who"><div class="name">Ramesh Kumar</div><div class="unit">Unit 2B</div></div>
+        <div class="rent">₹18,500 <span class="per">/mo</span></div>
+        <div><span class="badge pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Pending</span></div>
+        <div class="actions"><div class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar">AS</div>
+        <div class="who"><div class="name">Anita Sharma</div><div class="unit">Unit 1A</div></div>
+        <div class="rent">₹22,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><div class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar">VN</div>
+        <div class="who"><div class="name">Vikram Nair</div><div class="unit">Unit 3C</div></div>
+        <div class="rent">₹15,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><div class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar">SI</div>
+        <div class="who"><div class="name">Suresh Iyer</div><div class="unit">Unit 4B</div></div>
+        <div class="rent">₹20,000 <span class="per">/mo</span></div>
+        <div><span class="badge invited"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>Invited · Pending activation</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Resend invitation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></div>
+          <div class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">Secondary — Tenant "Pay Rent" · Phone (Light &amp; Dark)</div>
+<div class="stack">
+  <div class="phone-frame theme-light">
+    <div class="phone-notch"><div class="pill"></div></div>
+    <div class="phone-body">
+      <div class="phone-head">Pay rent</div>
+      <div class="phone-sub">Ramesh Kumar · Unit 2B</div>
+      <div class="due-card">
+        <div class="due-label">Due this cycle</div>
+        <div class="due-amount">₹18,500</div>
+        <div class="due-date">Due 5 October 2026</div>
+        <div class="status-pill unpaid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Not yet paid</div>
+        <button class="pay-btn">Pay now</button>
+      </div>
+      <div class="hist-title">Payment history</div>
+      <div class="hist-row"><div><div class="hist-month">September 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+      <div class="hist-row"><div><div class="hist-month">August 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+      <div class="hist-row"><div><div class="hist-month">July 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+    </div>
+  </div>
+
+  <div class="phone-frame theme-dark">
+    <div class="phone-notch"><div class="pill"></div></div>
+    <div class="phone-body">
+      <div class="phone-head">Pay rent</div>
+      <div class="phone-sub">Ramesh Kumar · Unit 2B</div>
+      <div class="due-card">
+        <div class="due-label">Due this cycle</div>
+        <div class="due-amount">₹18,500</div>
+        <div class="due-date">Due 5 October 2026</div>
+        <div class="status-pill unpaid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Not yet paid</div>
+        <button class="pay-btn">Pay now</button>
+      </div>
+      <div class="hist-title">Payment history</div>
+      <div class="hist-row"><div><div class="hist-month">September 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+      <div class="hist-row"><div><div class="hist-month">August 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+      <div class="hist-row"><div><div class="hist-month">July 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">State Variants — Overdue Row &amp; Empty Tenant List</div>
+<div class="stack">
+  <div class="variant-card theme-light">
+    <div class="variant-title">Overdue tenant row</div>
+    <div class="tenant-row" style="border:1px solid var(--border); border-radius:14px; padding:16px 18px;">
+      <div class="avatar">PM</div>
+      <div class="who"><div class="name">Priya Menon</div><div class="unit">Unit 5A</div></div>
+      <div class="rent">₹19,000 <span class="per">/mo</span></div>
+      <div><span class="badge overdue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Overdue · 6 days</span></div>
+      <div class="actions"><div class="btn-icon" title="Send reminder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></div></div>
+    </div>
+  </div>
+  <div class="variant-card theme-light">
+    <div class="variant-title">Empty tenant list (first-time setup)</div>
+    <div class="empty-state">
+      <div class="empty-mark">R</div>
+      <h3>No tenants yet</h3>
+      <p>Add your first tenant to start tracking rent and leases.</p>
+      <button class="btn btn-primary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add tenant</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

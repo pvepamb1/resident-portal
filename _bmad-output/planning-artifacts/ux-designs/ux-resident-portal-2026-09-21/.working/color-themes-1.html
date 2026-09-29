@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Resident Portal — Color Theme Explorations</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:#f0f0ee;
+    color:#1a1a1a;
+    padding: 24px 16px 64px;
+  }
+  .page-header{
+    max-width: 1100px;
+    margin: 0 auto 40px;
+  }
+  .page-header h1{
+    font-size: 1.6rem;
+    margin: 0 0 8px;
+  }
+  .page-header p{
+    margin: 0;
+    color:#555;
+    font-size: 0.95rem;
+    line-height:1.5;
+  }
+  .variation{
+    max-width: 1100px;
+    margin: 0 auto 56px;
+    background:#fff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .variation-header h2{
+    margin: 0 0 4px;
+    font-size: 1.3rem;
+  }
+  .variation-header .register{
+    margin: 0 0 20px;
+    font-size: 0.95rem;
+    color:#666;
+    font-style: italic;
+  }
+  .panels{
+    display:flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .panel{
+    flex: 1 1 420px;
+    min-width: 0;
+    border-radius: 12px;
+    padding: 20px;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+  }
+  .panel-label{
+    display:inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+  }
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 4px 10px 4px 4px;
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+  }
+  .swatch{
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    flex-shrink:0;
+  }
+  .chip code{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.65rem;
+    color: var(--color-text-primary);
+  }
+  /* ---- UI snippet: tenant list card ---- */
+  .card{
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .card-title-row{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .card-title-row h3{
+    margin:0;
+    font-size: 1.05rem;
+    color: var(--color-text-primary);
+  }
+  .btn-primary{
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    min-height: 44px;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .tenant-row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 4px;
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+  }
+  .tenant-row:first-of-type{ border-top: none; }
+  .tenant-info{ min-width: 180px; }
+  .tenant-name{
+    font-weight: 600;
+    font-size: 0.98rem;
+    color: var(--color-text-primary);
+  }
+  .tenant-sub{
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+  }
+  .rent-amount{
+    font-weight: 700;
+    font-size: 1.02rem;
+    color: var(--color-text-primary);
+    min-width: 100px;
+    text-align: right;
+  }
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 118px;
+    justify-content:center;
+  }
+  .status-pending{
+    background: color-mix(in srgb, var(--color-warning) 18%, var(--color-surface));
+    color: var(--color-warning);
+    border: 1.5px solid var(--color-warning);
+  }
+  .status-completed{
+    background: color-mix(in srgb, var(--color-success) 18%, var(--color-surface));
+    color: var(--color-success);
+    border: 1.5px solid var(--color-success);
+  }
+  .footnote{
+    margin-top: 14px;
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 520px){
+    .rent-amount{ text-align:left; }
+    .tenant-row{ flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Resident Portal — Color Theme Explorations</h1>
+  <p>Five palette directions for the same UI moment: a landlord's tenant list, with rent in ₹ and a payment status that must never be ambiguous ("pending" vs "completed" are distinguished by color, border weight, icon, and text — not color alone). Each theme is shown as a light/dark pair. Semantic token names are identical across themes; only the hex values change.</p>
+</div>
+
+<!--
+VARIATION 1: Warm Terracotta
+LIGHT: bg #FBF6F1 · surface #FFFFFF · text-primary #2E2320 · text-secondary #6B5A52
+       primary #C1592A · success #3F7D4F · warning #C68A1E · danger #B23A3A · border #E7D9CD
+DARK:  bg #201815 · surface #2B211D · text-primary #F5EAE3 · text-secondary #C9B6AA
+       primary #E17B48 · success #6FBF80 · warning #E0AC4C · danger #E2726B · border #43342D
+-->
+<section class="variation">
+  <div class="variation-header">
+    <h2>1. Warm Terracotta</h2>
+    <p class="register">Homely and grounded — feels like a trustworthy landlord who picks up the phone, not a faceless app.</p>
+  </div>
+  <div class="panels">
+    <div class="panel" style="
+      --color-bg:#FBF6F1; --color-surface:#FFFFFF; --color-text-primary:#2E2320; --color-text-secondary:#6B5A52;
+      --color-primary:#C1592A; --color-success:#3F7D4F; --color-warning:#C68A1E; --color-danger:#B23A3A; --color-border:#E7D9CD;">
+      <span class="panel-label">Light</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#FBF6F1"></span>background <code>#FBF6F1</code></span>
+        <span class="chip"><span class="swatch" style="background:#FFFFFF"></span>surface <code>#FFFFFF</code></span>
+        <span class="chip"><span class="swatch" style="background:#2E2320"></span>text-primary <code>#2E2320</code></span>
+        <span class="chip"><span class="swatch" style="background:#6B5A52"></span>text-secondary <code>#6B5A52</code></span>
+        <span class="chip"><span class="swatch" style="background:#C1592A"></span>primary <code>#C1592A</code></span>
+        <span class="chip"><span class="swatch" style="background:#3F7D4F"></span>success <code>#3F7D4F</code></span>
+        <span class="chip"><span class="swatch" style="background:#C68A1E"></span>warning <code>#C68A1E</code></span>
+        <span class="chip"><span class="swatch" style="background:#B23A3A"></span>danger <code>#B23A3A</code></span>
+        <span class="chip"><span class="swatch" style="background:#E7D9CD"></span>border <code>#E7D9CD</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+
+    <div class="panel" style="
+      --color-bg:#201815; --color-surface:#2B211D; --color-text-primary:#F5EAE3; --color-text-secondary:#C9B6AA;
+      --color-primary:#E17B48; --color-success:#6FBF80; --color-warning:#E0AC4C; --color-danger:#E2726B; --color-border:#43342D;">
+      <span class="panel-label">Dark</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#201815"></span>background <code>#201815</code></span>
+        <span class="chip"><span class="swatch" style="background:#2B211D"></span>surface <code>#2B211D</code></span>
+        <span class="chip"><span class="swatch" style="background:#F5EAE3"></span>text-primary <code>#F5EAE3</code></span>
+        <span class="chip"><span class="swatch" style="background:#C9B6AA"></span>text-secondary <code>#C9B6AA</code></span>
+        <span class="chip"><span class="swatch" style="background:#E17B48"></span>primary <code>#E17B48</code></span>
+        <span class="chip"><span class="swatch" style="background:#6FBF80"></span>success <code>#6FBF80</code></span>
+        <span class="chip"><span class="swatch" style="background:#E0AC4C"></span>warning <code>#E0AC4C</code></span>
+        <span class="chip"><span class="swatch" style="background:#E2726B"></span>danger <code>#E2726B</code></span>
+        <span class="chip"><span class="swatch" style="background:#43342D"></span>border <code>#43342D</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+  </div>
+</section>
+
+<!--
+VARIATION 2: Crisp Modern Fintech
+LIGHT: bg #F5F7FA · surface #FFFFFF · text-primary #101828 · text-secondary #5B6472
+       primary #2451D9 · success #128A5E · warning #B7791F · danger #D0342C · border #E3E8EF
+DARK:  bg #0B0F19 · surface #141A29 · text-primary #EDF1F7 · text-secondary #9AA5B6
+       primary #5B84FF · success #34C685 · warning #E5A93B · danger #F2665D · border #262E42
+-->
+<section class="variation">
+  <div class="variation-header">
+    <h2>2. Crisp Modern Fintech</h2>
+    <p class="register">Precise and efficient — the register of a UPI app or bank: "your money is being handled correctly."</p>
+  </div>
+  <div class="panels">
+    <div class="panel" style="
+      --color-bg:#F5F7FA; --color-surface:#FFFFFF; --color-text-primary:#101828; --color-text-secondary:#5B6472;
+      --color-primary:#2451D9; --color-success:#128A5E; --color-warning:#B7791F; --color-danger:#D0342C; --color-border:#E3E8EF;">
+      <span class="panel-label">Light</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#F5F7FA"></span>background <code>#F5F7FA</code></span>
+        <span class="chip"><span class="swatch" style="background:#FFFFFF"></span>surface <code>#FFFFFF</code></span>
+        <span class="chip"><span class="swatch" style="background:#101828"></span>text-primary <code>#101828</code></span>
+        <span class="chip"><span class="swatch" style="background:#5B6472"></span>text-secondary <code>#5B6472</code></span>
+        <span class="chip"><span class="swatch" style="background:#2451D9"></span>primary <code>#2451D9</code></span>
+        <span class="chip"><span class="swatch" style="background:#128A5E"></span>success <code>#128A5E</code></span>
+        <span class="chip"><span class="swatch" style="background:#B7791F"></span>warning <code>#B7791F</code></span>
+        <span class="chip"><span class="swatch" style="background:#D0342C"></span>danger <code>#D0342C</code></span>
+        <span class="chip"><span class="swatch" style="background:#E3E8EF"></span>border <code>#E3E8EF</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+
+    <div class="panel" style="
+      --color-bg:#0B0F19; --color-surface:#141A29; --color-text-primary:#EDF1F7; --color-text-secondary:#9AA5B6;
+      --color-primary:#5B84FF; --color-success:#34C685; --color-warning:#E5A93B; --color-danger:#F2665D; --color-border:#262E42;">
+      <span class="panel-label">Dark</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#0B0F19"></span>background <code>#0B0F19</code></span>
+        <span class="chip"><span class="swatch" style="background:#141A29"></span>surface <code>#141A29</code></span>
+        <span class="chip"><span class="swatch" style="background:#EDF1F7"></span>text-primary <code>#EDF1F7</code></span>
+        <span class="chip"><span class="swatch" style="background:#9AA5B6"></span>text-secondary <code>#9AA5B6</code></span>
+        <span class="chip"><span class="swatch" style="background:#5B84FF"></span>primary <code>#5B84FF</code></span>
+        <span class="chip"><span class="swatch" style="background:#34C685"></span>success <code>#34C685</code></span>
+        <span class="chip"><span class="swatch" style="background:#E5A93B"></span>warning <code>#E5A93B</code></span>
+        <span class="chip"><span class="swatch" style="background:#F2665D"></span>danger <code>#F2665D</code></span>
+        <span class="chip"><span class="swatch" style="background:#262E42"></span>border <code>#262E42</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+  </div>
+</section>
+
+<!--
+VARIATION 3: Calm Muted-Colorful
+LIGHT: bg #F4F7F5 · surface #FFFFFF · text-primary #2A3B36 · text-secondary #63776F
+       primary #3E8E7E · success #5A9C5E · warning #C9964B · danger #BC5A50 · border #DCE7E2
+DARK:  bg #172220 · surface #1F2E2A · text-primary #E7F0EC · text-secondary #A9BDB5
+       primary #6FBBAA · success #85C589 · warning #E0B876 · danger #E08A80 · border #34443E
+-->
+<section class="variation">
+  <div class="variation-header">
+    <h2>3. Calm Muted-Colorful</h2>
+    <p class="register">Soothing and unhurried — reduces stress for anyone nervous about money; still has real color, just no shouting.</p>
+  </div>
+  <div class="panels">
+    <div class="panel" style="
+      --color-bg:#F4F7F5; --color-surface:#FFFFFF; --color-text-primary:#2A3B36; --color-text-secondary:#63776F;
+      --color-primary:#3E8E7E; --color-success:#5A9C5E; --color-warning:#C9964B; --color-danger:#BC5A50; --color-border:#DCE7E2;">
+      <span class="panel-label">Light</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#F4F7F5"></span>background <code>#F4F7F5</code></span>
+        <span class="chip"><span class="swatch" style="background:#FFFFFF"></span>surface <code>#FFFFFF</code></span>
+        <span class="chip"><span class="swatch" style="background:#2A3B36"></span>text-primary <code>#2A3B36</code></span>
+        <span class="chip"><span class="swatch" style="background:#63776F"></span>text-secondary <code>#63776F</code></span>
+        <span class="chip"><span class="swatch" style="background:#3E8E7E"></span>primary <code>#3E8E7E</code></span>
+        <span class="chip"><span class="swatch" style="background:#5A9C5E"></span>success <code>#5A9C5E</code></span>
+        <span class="chip"><span class="swatch" style="background:#C9964B"></span>warning <code>#C9964B</code></span>
+        <span class="chip"><span class="swatch" style="background:#BC5A50"></span>danger <code>#BC5A50</code></span>
+        <span class="chip"><span class="swatch" style="background:#DCE7E2"></span>border <code>#DCE7E2</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+
+    <div class="panel" style="
+      --color-bg:#172220; --color-surface:#1F2E2A; --color-text-primary:#E7F0EC; --color-text-secondary:#A9BDB5;
+      --color-primary:#6FBBAA; --color-success:#85C589; --color-warning:#E0B876; --color-danger:#E08A80; --color-border:#34443E;">
+      <span class="panel-label">Dark</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#172220"></span>background <code>#172220</code></span>
+        <span class="chip"><span class="swatch" style="background:#1F2E2A"></span>surface <code>#1F2E2A</code></span>
+        <span class="chip"><span class="swatch" style="background:#E7F0EC"></span>text-primary <code>#E7F0EC</code></span>
+        <span class="chip"><span class="swatch" style="background:#A9BDB5"></span>text-secondary <code>#A9BDB5</code></span>
+        <span class="chip"><span class="swatch" style="background:#6FBBAA"></span>primary <code>#6FBBAA</code></span>
+        <span class="chip"><span class="swatch" style="background:#85C589"></span>success <code>#85C589</code></span>
+        <span class="chip"><span class="swatch" style="background:#E0B876"></span>warning <code>#E0B876</code></span>
+        <span class="chip"><span class="swatch" style="background:#E08A80"></span>danger <code>#E08A80</code></span>
+        <span class="chip"><span class="swatch" style="background:#34443E"></span>border <code>#34443E</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+  </div>
+</section>
+
+<!--
+VARIATION 4: Bold Marigold
+LIGHT: bg #FFF9F5 · surface #FFFFFF · text-primary #241522 · text-secondary #6E5568
+       primary #D6336C · success #2F9E44 · warning #E8A400 · danger #E03131 · border #F0DCE6
+DARK:  bg #1B1220 · surface #26182B · text-primary #F7ECF2 · text-secondary #C9AFC0
+       primary #FF7AA8 · success #63C471 · warning #F5C244 · danger #FF6B6B · border #3D2A3F
+-->
+<section class="variation">
+  <div class="variation-header">
+    <h2>4. Bold Marigold</h2>
+    <p class="register">Festive and confident — like a marigold garland at the door: this landlord is proud of a well-run home, not shy about it.</p>
+  </div>
+  <div class="panels">
+    <div class="panel" style="
+      --color-bg:#FFF9F5; --color-surface:#FFFFFF; --color-text-primary:#241522; --color-text-secondary:#6E5568;
+      --color-primary:#D6336C; --color-success:#2F9E44; --color-warning:#E8A400; --color-danger:#E03131; --color-border:#F0DCE6;">
+      <span class="panel-label">Light</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#FFF9F5"></span>background <code>#FFF9F5</code></span>
+        <span class="chip"><span class="swatch" style="background:#FFFFFF"></span>surface <code>#FFFFFF</code></span>
+        <span class="chip"><span class="swatch" style="background:#241522"></span>text-primary <code>#241522</code></span>
+        <span class="chip"><span class="swatch" style="background:#6E5568"></span>text-secondary <code>#6E5568</code></span>
+        <span class="chip"><span class="swatch" style="background:#D6336C"></span>primary <code>#D6336C</code></span>
+        <span class="chip"><span class="swatch" style="background:#2F9E44"></span>success <code>#2F9E44</code></span>
+        <span class="chip"><span class="swatch" style="background:#E8A400"></span>warning <code>#E8A400</code></span>
+        <span class="chip"><span class="swatch" style="background:#E03131"></span>danger <code>#E03131</code></span>
+        <span class="chip"><span class="swatch" style="background:#F0DCE6"></span>border <code>#F0DCE6</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+
+    <div class="panel" style="
+      --color-bg:#1B1220; --color-surface:#26182B; --color-text-primary:#F7ECF2; --color-text-secondary:#C9AFC0;
+      --color-primary:#FF7AA8; --color-success:#63C471; --color-warning:#F5C244; --color-danger:#FF6B6B; --color-border:#3D2A3F;">
+      <span class="panel-label">Dark</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#1B1220"></span>background <code>#1B1220</code></span>
+        <span class="chip"><span class="swatch" style="background:#26182B"></span>surface <code>#26182B</code></span>
+        <span class="chip"><span class="swatch" style="background:#F7ECF2"></span>text-primary <code>#F7ECF2</code></span>
+        <span class="chip"><span class="swatch" style="background:#C9AFC0"></span>text-secondary <code>#C9AFC0</code></span>
+        <span class="chip"><span class="swatch" style="background:#FF7AA8"></span>primary <code>#FF7AA8</code></span>
+        <span class="chip"><span class="swatch" style="background:#63C471"></span>success <code>#63C471</code></span>
+        <span class="chip"><span class="swatch" style="background:#F5C244"></span>warning <code>#F5C244</code></span>
+        <span class="chip"><span class="swatch" style="background:#FF6B6B"></span>danger <code>#FF6B6B</code></span>
+        <span class="chip"><span class="swatch" style="background:#3D2A3F"></span>border <code>#3D2A3F</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+  </div>
+</section>
+
+<!--
+VARIATION 5: Heritage Jewel
+LIGHT: bg #F6F5EF · surface #FFFFFF · text-primary #1E2A22 · text-secondary #5C6B60
+       primary #0E6E5A · success #3E8E4F · warning #B8860B · danger #A13B2E · border #DCE0D3
+DARK:  bg #101713 · surface #18221C · text-primary #EAF0E9 · text-secondary #A6B7AC
+       primary #3FBF9A · success #6FCB80 · warning #D9A93F · danger #E28870 · border #2A3830
+-->
+<section class="variation">
+  <div class="variation-header">
+    <h2>5. Heritage Jewel</h2>
+    <p class="register">Dignified and premium — deep emerald and gold, the register of a long-standing family property, not a startup.</p>
+  </div>
+  <div class="panels">
+    <div class="panel" style="
+      --color-bg:#F6F5EF; --color-surface:#FFFFFF; --color-text-primary:#1E2A22; --color-text-secondary:#5C6B60;
+      --color-primary:#0E6E5A; --color-success:#3E8E4F; --color-warning:#B8860B; --color-danger:#A13B2E; --color-border:#DCE0D3;">
+      <span class="panel-label">Light</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#F6F5EF"></span>background <code>#F6F5EF</code></span>
+        <span class="chip"><span class="swatch" style="background:#FFFFFF"></span>surface <code>#FFFFFF</code></span>
+        <span class="chip"><span class="swatch" style="background:#1E2A22"></span>text-primary <code>#1E2A22</code></span>
+        <span class="chip"><span class="swatch" style="background:#5C6B60"></span>text-secondary <code>#5C6B60</code></span>
+        <span class="chip"><span class="swatch" style="background:#0E6E5A"></span>primary <code>#0E6E5A</code></span>
+        <span class="chip"><span class="swatch" style="background:#3E8E4F"></span>success <code>#3E8E4F</code></span>
+        <span class="chip"><span class="swatch" style="background:#B8860B"></span>warning <code>#B8860B</code></span>
+        <span class="chip"><span class="swatch" style="background:#A13B2E"></span>danger <code>#A13B2E</code></span>
+        <span class="chip"><span class="swatch" style="background:#DCE0D3"></span>border <code>#DCE0D3</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+
+    <div class="panel" style="
+      --color-bg:#101713; --color-surface:#18221C; --color-text-primary:#EAF0E9; --color-text-secondary:#A6B7AC;
+      --color-primary:#3FBF9A; --color-success:#6FCB80; --color-warning:#D9A93F; --color-danger:#E28870; --color-border:#2A3830;">
+      <span class="panel-label">Dark</span>
+      <div class="chips">
+        <span class="chip"><span class="swatch" style="background:#101713"></span>background <code>#101713</code></span>
+        <span class="chip"><span class="swatch" style="background:#18221C"></span>surface <code>#18221C</code></span>
+        <span class="chip"><span class="swatch" style="background:#EAF0E9"></span>text-primary <code>#EAF0E9</code></span>
+        <span class="chip"><span class="swatch" style="background:#A6B7AC"></span>text-secondary <code>#A6B7AC</code></span>
+        <span class="chip"><span class="swatch" style="background:#3FBF9A"></span>primary <code>#3FBF9A</code></span>
+        <span class="chip"><span class="swatch" style="background:#6FCB80"></span>success <code>#6FCB80</code></span>
+        <span class="chip"><span class="swatch" style="background:#D9A93F"></span>warning <code>#D9A93F</code></span>
+        <span class="chip"><span class="swatch" style="background:#E28870"></span>danger <code>#E28870</code></span>
+        <span class="chip"><span class="swatch" style="background:#2A3830"></span>border <code>#2A3830</code></span>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Tenants</h3>
+          <button class="btn-primary" type="button">+ Add tenant</button>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Ramesh Kumar</div>
+            <div class="tenant-sub">Unit 2B</div>
+          </div>
+          <div class="rent-amount">₹18,500</div>
+          <span class="status-pill status-pending">○ Pending</span>
+        </div>
+        <div class="tenant-row">
+          <div class="tenant-info">
+            <div class="tenant-name">Anita Sharma</div>
+            <div class="tenant-sub">Unit 1A</div>
+          </div>
+          <div class="rent-amount">₹22,000</div>
+          <span class="status-pill status-completed">✓ Completed</span>
+        </div>
+      </div>
+      <div class="footnote">This month's rent</div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

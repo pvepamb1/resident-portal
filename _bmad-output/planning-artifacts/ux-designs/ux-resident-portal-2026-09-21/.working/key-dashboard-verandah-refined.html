@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Refinement: Verandah Ledger — Landlord Dashboard</title>
+<style>
+/*
+  REFINEMENT OF: direction-verandah-ledger.html (Verandah Ledger direction)
+  ------------------------------------------------------------------
+  This file is a refinement confirmation mock of ONLY the landlord dashboard
+  hero screen from the base direction file, with exactly two decided changes.
+  Every other layout, spacing, color and type decision is carried over
+  unchanged from the base (locked tokens, 28px card padding / 18-20px row
+  padding, 18px card radius, 999px pill radius, ink-underline hover sketch,
+  serif headline + sans body pairing, warm hover tint).
+
+  CHANGE 1 — Page title (in-app topbar wordmark):
+    Base:     left-aligned, 24px word + 44px plain "R" letter-in-circle mark.
+    Refined:  center-aligned within the topbar, larger (32px word + 60px
+              mark), and the bare "R" is replaced with a crafted seal-style
+              logo mark — a double hairline ring (outer gold, inner emerald)
+              around an "R&P" monogram set in the same serif as the
+              wordmark, with a small laurel-sprig line-art motif at the
+              base of the seal (echoing the "leaf glyph" motif already
+              named in the base direction's register notes). Built with
+              inline SVG using the existing --primary/--warning tokens, so
+              no new colors are introduced beyond the locked Heritage Jewel
+              palette (emerald #0E6E5A / gold #B8860B light,
+              #3FBF9A / #D9A93F dark).
+
+  CHANGE 2 — Tenant row avatars:
+    Base:     42px circle, tinted background, colored initials (e.g. "RK").
+    Refined:  52px circle, FLAT (non-tinted, non-gradient) --primary fill,
+              containing a simple flat person-silhouette icon (head +
+              shoulders) in the surface color, clipped by the circle. No
+              initials. Applies to every .avatar instance so the tenant
+              list reads consistently.
+
+  Everything else — tenant row data, "+ Add tenant" action, per-row
+  edit/resend icon buttons, badges, spacing, corner radii and hover
+  behavior — is unchanged from the base file.
+*/
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:40px 24px 80px; background:#EDEAE0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:#1E2A22;
+}
+h1.page-title{font-family:Georgia,"Iowan Old Style",serif; font-size:26px; margin:0 0 6px;}
+.rationale{max-width:880px; font-size:15px; line-height:1.6; color:#3c463f; margin:0 0 40px;}
+.section-label{font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:#6b7a70; margin:48px 0 14px; font-weight:600;}
+
+/* ---------- theme variable scopes (unchanged from base) ---------- */
+.theme-light{
+  --bg:#F6F5EF; --surface:#FFFFFF; --text:#1E2A22; --text2:#5C6B60;
+  --primary:#0E6E5A; --success:#3E8E4F; --warning:#B8860B; --danger:#A13B2E; --border:#DCE0D3;
+  --success-tint:#E8F3EA; --warning-tint:#FBF2DE; --danger-tint:#F7E7E3; --primary-tint:#E4F1EC;
+}
+.theme-dark{
+  --bg:#101713; --surface:#18221C; --text:#EAF0E9; --text2:#A6B7AC;
+  --primary:#3FBF9A; --success:#6FCB80; --warning:#D9A93F; --danger:#E28870; --border:#2A3830;
+  --success-tint:#1C2D20; --warning-tint:#2E2718; --danger-tint:#301E1A; --primary-tint:#152420;
+}
+
+/* ---------- browser frame (hero) — unchanged from base ---------- */
+.browser-frame{
+  width:960px; max-width:100%; border-radius:18px; overflow:hidden;
+  border:1px solid var(--border); box-shadow:0 18px 40px -18px rgba(20,30,20,.25);
+  background:var(--bg);
+}
+.browser-chrome{
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.dots{display:flex; gap:6px;}
+.dots span{width:10px; height:10px; border-radius:50%; background:var(--border);}
+.addr{flex:1; background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:12px; color:var(--text2);}
+
+.app{padding:32px 36px 40px; background:var(--bg);}
+
+/* ---------- CHANGE 1: topbar / wordmark — center-aligned, larger, seal mark ---------- */
+.topbar{
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px;
+  padding-bottom:26px; border-bottom:1px solid var(--border); margin-bottom:32px;
+}
+.wordmark{grid-column:2; display:flex; align-items:center; gap:16px; justify-self:center;}
+.mark{width:60px; height:60px; flex:none; display:flex; align-items:center; justify-content:center;}
+.word{font-family:Georgia,"Iowan Old Style",serif; font-size:32px; letter-spacing:.01em; color:var(--text); text-align:center;}
+.tagline{font-size:12px; color:var(--text2); letter-spacing:.04em; margin-top:3px; text-align:center;}
+.owner-chip{grid-column:3; justify-self:end; display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text2);}
+.owner-chip .av{width:32px; height:32px; border-radius:50%; background:var(--primary-tint); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; font-family:Georgia,serif;}
+
+.section-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:20px;}
+.section-head h2{font-family:Georgia,"Iowan Old Style",serif; font-size:21px; margin:0 0 4px; color:var(--text); font-weight:400;}
+.section-head p{margin:0; font-size:13px; color:var(--text2);}
+
+.btn{
+  border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:600;
+  border-radius:999px; padding:11px 22px; display:inline-flex; align-items:center; gap:8px;
+  transition:box-shadow .18s ease, transform .18s ease;
+}
+.btn-primary{background:var(--primary); color:#fff;}
+.btn-primary:hover{box-shadow:0 6px 18px -6px var(--primary); transform:translateY(-1px);}
+.btn-icon{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--surface);
+  color:var(--text2); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:border-color .18s ease, color .18s ease;
+}
+.btn-icon:hover{border-color:var(--primary); color:var(--primary);}
+
+.tenant-card{background:var(--surface); border:1px solid var(--border); border-radius:18px; overflow:hidden;}
+.tenant-row{
+  display:grid; grid-template-columns:auto 1.6fr 1fr 1fr auto; align-items:center; gap:18px;
+  padding:20px 24px; border-bottom:1px solid var(--border); position:relative;
+}
+.tenant-row:last-child{border-bottom:none;}
+.tenant-row:hover{background:var(--primary-tint);}
+.tenant-row:hover .name::after{transform:scaleX(1);}
+
+/* ---------- CHANGE 2: tenant avatar — flat color circle + person icon ---------- */
+.avatar{
+  width:52px; height:52px; border-radius:50%; background:var(--primary);
+  display:flex; align-items:center; justify-content:center; overflow:hidden; flex:none;
+}
+.avatar svg{width:28px; height:28px; fill:var(--surface);}
+
+.who .name{font-size:15px; font-weight:600; color:var(--text); position:relative; display:inline-block;}
+.who .name::after{content:""; position:absolute; left:0; bottom:-3px; width:100%; height:1px; background:var(--primary); transform:scaleX(0); transform-origin:left; transition:transform .25s ease;}
+.who .unit{font-size:13px; color:var(--text2); margin-top:3px;}
+.rent{font-size:15px; color:var(--text); font-variant-numeric:tabular-nums;}
+.rent .per{font-size:12px; color:var(--text2);}
+.badge{display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; font-size:12.5px; font-weight:600;}
+.badge svg{width:13px; height:13px;}
+.badge.completed{background:var(--success-tint); color:var(--success);}
+.badge.pending{background:var(--warning-tint); color:var(--warning);}
+.badge.invited{background:var(--primary-tint); color:var(--primary);}
+.actions{display:flex; gap:8px; justify-content:flex-end;}
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Refinement Confirmation — Verandah Ledger</h1>
+<p class="rationale">Landlord dashboard hero screen, refined per two decisions: the topbar title is now center-aligned and larger, carried by a crafted seal-style "R&amp;P" monogram mark instead of a bare letter; tenant row avatars are now fuller flat-color circles holding a simple person-silhouette icon instead of initials. Everything else — content, spacing, radii, hover behavior — is unchanged from the base direction file.</p>
+
+<div class="section-label">Hero — Landlord Dashboard · Light</div>
+<div class="browser-frame theme-light">
+  <div class="browser-chrome">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="addr">residentportal.app/dashboard</div>
+  </div>
+  <div class="app">
+    <div class="topbar">
+      <div></div>
+      <div class="wordmark">
+        <div class="mark">
+          <svg viewBox="0 0 60 60" width="60" height="60" aria-hidden="true">
+            <circle cx="30" cy="30" r="28" fill="var(--surface)" stroke="var(--warning)" stroke-width="1.5"/>
+            <circle cx="30" cy="30" r="23.5" fill="none" stroke="var(--primary)" stroke-width="1"/>
+            <text x="30" y="28" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', serif" font-size="16" font-weight="600" fill="var(--primary)">R&amp;P</text>
+            <line x1="20.5" y1="33" x2="39.5" y2="33" stroke="var(--warning)" stroke-width="1"/>
+            <path d="M18 38c-4 3-5 8-2 12" fill="none" stroke="var(--warning)" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M17 41l-3.5 -1M16.4 44.5l-3.6 -0.4M16.4 48l-3.2 1" stroke="var(--warning)" stroke-width="1" stroke-linecap="round"/>
+            <path d="M42 38c4 3 5 8 2 12" fill="none" stroke="var(--warning)" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M43 41l3.5 -1M43.6 44.5l3.6 -0.4M43.6 48l3.2 1" stroke="var(--warning)" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="word">Resident Portal</div>
+          <div class="tagline">Proprietor-managed residences</div>
+        </div>
+      </div>
+      <div class="owner-chip"><div class="av">PV</div> Prasenna Venkatesh</div>
+    </div>
+
+    <div class="section-head">
+      <div>
+        <h2>Tenants</h2>
+        <p>4 residences under management</p>
+      </div>
+      <button class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add tenant
+      </button>
+    </div>
+
+    <div class="tenant-card">
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Ramesh Kumar</div><div class="unit">Unit 2B</div></div>
+        <div class="rent">₹18,500 <span class="per">/mo</span></div>
+        <div><span class="badge pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Pending</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Anita Sharma</div><div class="unit">Unit 1A</div></div>
+        <div class="rent">₹22,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Vikram Nair</div><div class="unit">Unit 3C</div></div>
+        <div class="rent">₹15,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Suresh Iyer</div><div class="unit">Unit 4B</div></div>
+        <div class="rent">₹20,000 <span class="per">/mo</span></div>
+        <div><span class="badge invited"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>Invited · Pending activation</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Resend invitation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></div>
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">Hero — Landlord Dashboard · Dark</div>
+<div class="browser-frame theme-dark">
+  <div class="browser-chrome">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="addr">residentportal.app/dashboard</div>
+  </div>
+  <div class="app">
+    <div class="topbar">
+      <div></div>
+      <div class="wordmark">
+        <div class="mark">
+          <svg viewBox="0 0 60 60" width="60" height="60" aria-hidden="true">
+            <circle cx="30" cy="30" r="28" fill="var(--surface)" stroke="var(--warning)" stroke-width="1.5"/>
+            <circle cx="30" cy="30" r="23.5" fill="none" stroke="var(--primary)" stroke-width="1"/>
+            <text x="30" y="28" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', serif" font-size="16" font-weight="600" fill="var(--primary)">R&amp;P</text>
+            <line x1="20.5" y1="33" x2="39.5" y2="33" stroke="var(--warning)" stroke-width="1"/>
+            <path d="M18 38c-4 3-5 8-2 12" fill="none" stroke="var(--warning)" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M17 41l-3.5 -1M16.4 44.5l-3.6 -0.4M16.4 48l-3.2 1" stroke="var(--warning)" stroke-width="1" stroke-linecap="round"/>
+            <path d="M42 38c4 3 5 8 2 12" fill="none" stroke="var(--warning)" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M43 41l3.5 -1M43.6 44.5l3.6 -0.4M43.6 48l3.2 1" stroke="var(--warning)" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="word">Resident Portal</div>
+          <div class="tagline">Proprietor-managed residences</div>
+        </div>
+      </div>
+      <div class="owner-chip"><div class="av">PV</div> Prasenna Venkatesh</div>
+    </div>
+
+    <div class="section-head">
+      <div><h2>Tenants</h2><p>4 residences under management</p></div>
+      <button class="btn btn-primary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add tenant</button>
+    </div>
+
+    <div class="tenant-card">
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Ramesh Kumar</div><div class="unit">Unit 2B</div></div>
+        <div class="rent">₹18,500 <span class="per">/mo</span></div>
+        <div><span class="badge pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Pending</span></div>
+        <div class="actions"><div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Anita Sharma</div><div class="unit">Unit 1A</div></div>
+        <div class="rent">₹22,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Vikram Nair</div><div class="unit">Unit 3C</div></div>
+        <div class="rent">₹15,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Suresh Iyer</div><div class="unit">Unit 4B</div></div>
+        <div class="rent">₹20,000 <span class="per">/mo</span></div>
+        <div><span class="badge invited"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>Invited · Pending activation</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Resend invitation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></div>
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

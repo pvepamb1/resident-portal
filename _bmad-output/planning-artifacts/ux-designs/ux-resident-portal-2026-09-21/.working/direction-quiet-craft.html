@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Direction: Quiet Craft Ledger — Resident Portal</title>
+<style>
+/*
+  DIRECTION: Quiet Craft Ledger (quiet utilitarian, hand-kept ledger-book craft)
+  --------------------------------------------------------------------------
+  LOCKED TOKENS (unchanged across all directions):
+    light  bg #F6F5EF  surface #FFFFFF  text #1E2A22  text2 #5C6B60
+           primary #0E6E5A  success #3E8E4F  warning #B8860B  danger #A13B2E  border #DCE0D3
+    dark   bg #101713  surface #18221C  text #EAF0E9  text2 #A6B7AC
+           primary #3FBF9A  success #6FCB80  warning #D9A93F  danger #E28870  border #2A3830
+
+  DIRECTION-SPECIFIC DECISIONS:
+    type      : quiet utilitarian labels — small-caps meta text (11px, tracked),
+                medium (not bold, not thin) 17-19px headlines; nothing shouts,
+                everything is legible and calm
+    density   : medium-compact — 16-18px row padding, fine hairline rules
+                between every row (paper-ledger rhythm) rather than card shadows
+    radius    : soft but small — 8px cards, 6px inputs/badges (never a full pill,
+                never sharp) — a restrained middle ground
+    motion    : subtle underline-grow on hover (a fine rule extends under the
+                tenant name), implying quiet liveliness without flourish
+    register  : craft/artisanal ledger-book — a small dot-mark "R·P" monogram,
+                a faint repeating hairline texture on the header (paper-ledger
+                feel), fine rules everywhere instead of boxes
+    spacing   : base unit 8px, fine 1px hairlines as the primary structural device
+*/
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:40px 24px 80px; background:#EBE8DE;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:#1E2A22;
+}
+h1.page-title{font-size:23px; margin:0 0 6px; font-weight:600;}
+.rationale{max-width:880px; font-size:14.5px; line-height:1.6; color:#3c463f; margin:0 0 40px;}
+.section-label{font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#6b7a70; margin:44px 0 14px; font-weight:600;}
+.stack{display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start;}
+
+.theme-light{
+  --bg:#F6F5EF; --surface:#FFFFFF; --text:#1E2A22; --text2:#5C6B60;
+  --primary:#0E6E5A; --success:#3E8E4F; --warning:#B8860B; --danger:#A13B2E; --border:#DCE0D3;
+  --success-tint:#E8F3EA; --warning-tint:#FBF2DE; --danger-tint:#F7E7E3; --primary-tint:#E4F1EC;
+}
+.theme-dark{
+  --bg:#101713; --surface:#18221C; --text:#EAF0E9; --text2:#A6B7AC;
+  --primary:#3FBF9A; --success:#6FCB80; --warning:#D9A93F; --danger:#E28870; --border:#2A3830;
+  --success-tint:#1C2D20; --warning-tint:#2E2718; --danger-tint:#301E1A; --primary-tint:#152420;
+}
+
+.browser-frame{width:960px; max-width:100%; border-radius:10px; overflow:hidden; border:1px solid var(--border); background:var(--bg);}
+.browser-chrome{display:flex; align-items:center; gap:10px; padding:11px 16px; background:var(--surface); border-bottom:1px solid var(--border);}
+.dots{display:flex; gap:6px;}
+.dots span{width:9px; height:9px; border-radius:50%; background:var(--border);}
+.addr{flex:1; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:6px 12px; font-size:12px; color:var(--text2);}
+
+.topbar{
+  display:flex; align-items:center; justify-content:space-between; padding:20px 32px;
+  background:
+    repeating-linear-gradient(180deg, transparent, transparent 27px, var(--border) 27px, var(--border) 28px),
+    var(--surface);
+  background-size:100% 28px;
+  border-bottom:1px solid var(--border);
+}
+.wordmark{display:flex; align-items:center; gap:12px;}
+.mark{width:34px; height:34px; border-radius:8px; border:1px solid var(--primary); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; letter-spacing:.02em; flex:none;}
+.word{font-size:17px; font-weight:600; color:var(--text);}
+.tagline{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--text2); margin-top:2px;}
+.owner-chip{font-size:12.5px; color:var(--text2);}
+
+.app{padding:28px 32px 36px; background:var(--bg);}
+.section-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--border);}
+.section-head h2{font-size:18px; margin:0 0 4px; font-weight:600; color:var(--text);}
+.section-head p{margin:0; font-size:12.5px; color:var(--text2); letter-spacing:.02em;}
+
+.btn{border:none; cursor:pointer; font-family:inherit; font-size:13.5px; font-weight:600; border-radius:6px; padding:10px 18px;}
+.btn-primary{background:var(--primary); color:#fff;}
+.btn-primary:hover{opacity:.88;}
+.btn-icon{border:1px solid var(--border); background:var(--surface); color:var(--text2); font-size:11.5px; font-weight:600; padding:7px 11px; border-radius:6px; cursor:pointer; letter-spacing:.02em;}
+.btn-icon:hover{border-color:var(--primary); color:var(--primary);}
+
+.tenant-card{background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden;}
+.tenant-row{display:grid; grid-template-columns:1.6fr 1fr 1.1fr auto; align-items:center; gap:16px; padding:16px 20px; border-bottom:1px solid var(--border);}
+.tenant-row:last-child{border-bottom:none;}
+.tenant-row:hover{background:var(--bg);}
+.who .name{font-size:14.5px; font-weight:600; color:var(--text); position:relative; display:inline-block; border-bottom:1px solid transparent;}
+.tenant-row:hover .name{border-bottom-color:var(--primary);}
+.who .unit{font-size:11.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--text2); margin-top:3px;}
+.rent{font-size:14px; color:var(--text); font-variant-numeric:tabular-nums;}
+.rent .per{font-size:11px; color:var(--text2);}
+.badge{display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:6px; font-size:11.5px; font-weight:700; letter-spacing:.02em;}
+.badge svg{width:12px; height:12px;}
+.badge.completed{background:var(--success-tint); color:var(--success);}
+.badge.pending{background:var(--warning-tint); color:var(--warning);}
+.badge.invited{background:var(--primary-tint); color:var(--primary);}
+.badge.overdue{background:var(--danger-tint); color:var(--danger);}
+.actions{display:flex; gap:6px; justify-content:flex-end;}
+
+.phone-frame{width:300px; border-radius:20px; border:1px solid var(--border); overflow:hidden; background:var(--bg);}
+.phone-notch{height:22px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:center;}
+.phone-notch .pill{width:58px; height:5px; border-radius:3px; background:var(--border);}
+.phone-body{padding:20px 18px 24px;}
+.phone-head{font-size:16.5px; font-weight:600; color:var(--text); margin-bottom:2px;}
+.phone-sub{font-size:11.5px; letter-spacing:.03em; text-transform:uppercase; color:var(--text2); margin-bottom:18px;}
+.due-card{background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:18px; text-align:center; margin-bottom:18px;}
+.due-label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text2); margin-bottom:7px;}
+.due-amount{font-size:28px; font-weight:600; color:var(--text); margin-bottom:5px;}
+.due-date{font-size:12.5px; color:var(--text2); margin-bottom:14px;}
+.status-pill{display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:6px; font-size:12.5px; font-weight:700; margin-bottom:14px;}
+.status-pill.unpaid{background:var(--warning-tint); color:var(--warning);}
+.status-pill svg{width:14px; height:14px;}
+.pay-btn{width:100%; padding:13px; border-radius:6px; border:none; background:var(--primary); color:#fff; font-size:14px; font-weight:700; cursor:pointer;}
+.hist-title{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text2); margin:18px 0 8px;}
+.hist-row{display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--border);}
+.hist-row:last-child{border-bottom:none;}
+.hist-month{font-size:13px; color:var(--text); font-weight:600;}
+.hist-amt{font-size:11px; color:var(--text2);}
+.hist-status{display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700;}
+.hist-status.paid{color:var(--success);}
+.hist-status svg{width:12px; height:12px;}
+
+.variant-card{background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:22px; width:420px; max-width:100%;}
+.variant-title{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text2); margin-bottom:12px; font-weight:700;}
+.empty-state{text-align:center; padding:16px 8px;}
+.empty-mark{width:44px; height:44px; margin:0 auto 12px; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--text2); font-size:11px; font-weight:700;}
+.empty-state h3{font-size:15px; font-weight:600; margin:0 0 6px; color:var(--text);}
+.empty-state p{font-size:12.5px; color:var(--text2); margin:0 0 16px;}
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Direction 5 — Quiet Craft Ledger</h1>
+<p class="rationale">A hand-kept ledger-book feel: a faint ruled-paper texture behind the header, fine hairlines instead of boxes, and small-caps meta labels keep the voice quiet and confident rather than loud. A fine rule grows beneath a tenant's name on hover — the only flourish in an otherwise restrained, craft-paper register.</p>
+
+<div class="section-label">Hero — Landlord Dashboard · Light</div>
+<div class="browser-frame theme-light">
+  <div class="browser-chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">residentportal.app/dashboard</div></div>
+  <div class="topbar">
+    <div class="wordmark"><div class="mark">R·P</div><div><div class="word">Resident Portal</div><div class="tagline">Rent Ledger</div></div></div>
+    <div class="owner-chip">Prasenna Venkatesh</div>
+  </div>
+  <div class="app">
+    <div class="section-head"><div><h2>Tenants</h2><p>4 entries · this cycle</p></div><button class="btn btn-primary">+ Add tenant</button></div>
+    <div class="tenant-card">
+      <div class="tenant-row">
+        <div class="who"><div class="name">Ramesh Kumar</div><div class="unit">Unit 2B</div></div>
+        <div class="rent">₹18,500 <span class="per">/mo</span></div>
+        <div><span class="badge pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Pending</span></div>
+        <div class="actions"><button class="btn-icon">Edit</button></div>
+      </div>
+      <div class="tenant-row">
+        <div class="who"><div class="name">Anita Sharma</div><div class="unit">Unit 1A</div></div>
+        <div class="rent">₹22,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><button class="btn-icon">Edit</button></div>
+      </div>
+      <div class="tenant-row">
+        <div class="who"><div class="name">Vikram Nair</div><div class="unit">Unit 3C</div></div>
+        <div class="rent">₹15,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><button class="btn-icon">Edit</button></div>
+      </div>
+      <div class="tenant-row">
+        <div class="who"><div class="name">Suresh Iyer</div><div class="unit">Unit 4B</div></div>
+        <div class="rent">₹20,000 <span class="per">/mo</span></div>
+        <div><span class="badge invited"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>Invited · pending activation</span></div>
+        <div class="actions"><button class="btn-icon">Resend</button><button class="btn-icon">Edit</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">Hero — Landlord Dashboard · Dark</div>
+<div class="browser-frame theme-dark">
+  <div class="browser-chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">residentportal.app/dashboard</div></div>
+  <div class="topbar">
+    <div class="wordmark"><div class="mark">R·P</div><div><div class="word">Resident Portal</div><div class="tagline">Rent Ledger</div></div></div>
+    <div class="owner-chip">Prasenna Venkatesh</div>
+  </div>
+  <div class="app">
+    <div class="section-head"><div><h2>Tenants</h2><p>4 entries · this cycle</p></div><button class="btn btn-primary">+ Add tenant</button></div>
+    <div class="tenant-card">
+      <div class="tenant-row">
+        <div class="who"><div class="name">Ramesh Kumar</div><div class="unit">Unit 2B</div></div>
+        <div class="rent">₹18,500 <span class="per">/mo</span></div>
+        <div><span class="badge pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Pending</span></div>
+        <div class="actions"><button class="btn-icon">Edit</button></div>
+      </div>
+      <div class="tenant-row">
+        <div class="who"><div class="name">Anita Sharma</div><div class="unit">Unit 1A</div></div>
+        <div class="rent">₹22,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><button class="btn-icon">Edit</button></div>
+      </div>
+      <div class="tenant-row">
+        <div class="who"><div class="name">Vikram Nair</div><div class="unit">Unit 3C</div></div>
+        <div class="rent">₹15,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><button class="btn-icon">Edit</button></div>
+      </div>
+      <div class="tenant-row">
+        <div class="who"><div class="name">Suresh Iyer</div><div class="unit">Unit 4B</div></div>
+        <div class="rent">₹20,000 <span class="per">/mo</span></div>
+        <div><span class="badge invited"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>Invited · pending activation</span></div>
+        <div class="actions"><button class="btn-icon">Resend</button><button class="btn-icon">Edit</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">Secondary — Tenant "Pay Rent" · Phone (Light &amp; Dark)</div>
+<div class="stack">
+  <div class="phone-frame theme-light">
+    <div class="phone-notch"><div class="pill"></div></div>
+    <div class="phone-body">
+      <div class="phone-head">Pay rent</div>
+      <div class="phone-sub">Ramesh Kumar · Unit 2B</div>
+      <div class="due-card">
+        <div class="due-label">Due this cycle</div>
+        <div class="due-amount">₹18,500</div>
+        <div class="due-date">Due 5 Oct 2026</div>
+        <div class="status-pill unpaid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Not yet paid</div>
+        <button class="pay-btn">Pay now</button>
+      </div>
+      <div class="hist-title">Payment history</div>
+      <div class="hist-row"><div><div class="hist-month">September 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+      <div class="hist-row"><div><div class="hist-month">August 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+      <div class="hist-row"><div><div class="hist-month">July 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+    </div>
+  </div>
+
+  <div class="phone-frame theme-dark">
+    <div class="phone-notch"><div class="pill"></div></div>
+    <div class="phone-body">
+      <div class="phone-head">Pay rent</div>
+      <div class="phone-sub">Ramesh Kumar · Unit 2B</div>
+      <div class="due-card">
+        <div class="due-label">Due this cycle</div>
+        <div class="due-amount">₹18,500</div>
+        <div class="due-date">Due 5 Oct 2026</div>
+        <div class="status-pill unpaid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Not yet paid</div>
+        <button class="pay-btn">Pay now</button>
+      </div>
+      <div class="hist-title">Payment history</div>
+      <div class="hist-row"><div><div class="hist-month">September 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+      <div class="hist-row"><div><div class="hist-month">August 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+      <div class="hist-row"><div><div class="hist-month">July 2026</div><div class="hist-amt">₹18,500</div></div><div class="hist-status paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">State Variants — Overdue Row &amp; Empty Tenant List</div>
+<div class="stack">
+  <div class="variant-card theme-light">
+    <div class="variant-title">Overdue tenant row</div>
+    <div class="tenant-row" style="border:1px solid var(--border); border-radius:8px;">
+      <div class="who"><div class="name">Priya Menon</div><div class="unit">Unit 5A</div></div>
+      <div class="rent">₹19,000 <span class="per">/mo</span></div>
+      <div><span class="badge overdue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Overdue · 6 days</span></div>
+      <div class="actions"><button class="btn-icon">Remind</button></div>
+    </div>
+  </div>
+  <div class="variant-card theme-light">
+    <div class="variant-title">Empty tenant list</div>
+    <div class="empty-state">
+      <div class="empty-mark">R·P</div>
+      <h3>No entries yet</h3>
+      <p>Add your first tenant to open the ledger.</p>
+      <button class="btn btn-primary">+ Add tenant</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

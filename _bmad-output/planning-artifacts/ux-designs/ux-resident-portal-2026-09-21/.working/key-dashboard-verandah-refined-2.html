@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Refinement: Verandah Ledger — Landlord Dashboard (v2)</title>
+<style>
+/*
+  REFINEMENT OF: key-dashboard-verandah-refined.html
+  ------------------------------------------------------------------
+  This file carries forward the prior refinement (center-aligned larger
+  wordmark, flat-circle person-silhouette avatars) UNCHANGED, and applies
+  exactly three additional decided changes on top of it:
+
+  CHANGE A — Logo mark swap (seal/monogram → penguin silhouette):
+    The ring + "R&P" monogram + laurel sprig seal is replaced with a
+    simple, flat, front-facing waddling-pose penguin silhouette (this
+    pose reads more clearly at 60px than a side profile, which loses
+    the head/wing/foot silhouette at small sizes). The double-hairline
+    ring is KEPT but simplified to a single fine outer ring (gold) so it
+    frames the penguin as a badge/medallion without competing lines
+    across the body the way the old inner ring + monogram baseline did.
+    Built with inline SVG using only the existing --primary/--warning/
+    --surface tokens — no new colors introduced.
+
+  CHANGE B — Title background plate:
+    The centered title+logo lockup (topbar wordmark block) now sits on
+    a soft-rounded light plate (#FAF7F0, warm off-white/cream, Heritage
+    Jewel family) in BOTH light and dark mode, so the header always
+    reads as a light banner strip regardless of overall theme. The
+    seal/penguin ring keeps var(--surface)-based fill for its inner
+    disc as before; the plate sits behind the whole lockup with generous
+    padding so it reads as an intentional banner, not a stray box.
+
+  CHANGE C — Dark mode base tokens lightened:
+    --bg moved from #101713 to #1C2F26; --surface moved from #18221C to
+    #243B30. Both stay in the deep-emerald "Heritage Jewel" family
+    (lightened dark teal-green rather than near-black). Contrast against
+    existing dark tokens checked via WCAG contrast ratio (all comfortably
+    >=4.5:1 against bg/surface: text-primary ~12.2:1 / 10.4:1, text-
+    secondary ~6.7:1 / 5.7:1, primary ~6.2:1 / 5.2:1, success ~7.1:1 /
+    6.0:1, warning ~6.5:1 / 5.6:1, danger ~5.4:1 / 4.6:1). No other dark
+    tokens changed.
+
+  Everything else — tenant row data, "+ Add tenant" action, per-row
+  edit/resend icon buttons, badges, spacing, corner radii (18px card /
+  999px pill) and ink-underline hover behavior — is unchanged from the
+  prior refined file.
+*/
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:40px 24px 80px; background:#EDEAE0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:#1E2A22;
+}
+h1.page-title{font-family:Georgia,"Iowan Old Style",serif; font-size:26px; margin:0 0 6px;}
+.rationale{max-width:880px; font-size:15px; line-height:1.6; color:#3c463f; margin:0 0 40px;}
+.section-label{font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:#6b7a70; margin:48px 0 14px; font-weight:600;}
+
+/* ---------- theme variable scopes ---------- */
+.theme-light{
+  --bg:#F6F5EF; --surface:#FFFFFF; --text:#1E2A22; --text2:#5C6B60;
+  --primary:#0E6E5A; --success:#3E8E4F; --warning:#B8860B; --danger:#A13B2E; --border:#DCE0D3;
+  --success-tint:#E8F3EA; --warning-tint:#FBF2DE; --danger-tint:#F7E7E3; --primary-tint:#E4F1EC;
+}
+/* CHANGE C: dark bg/surface lightened — #101713→#1C2F26, #18221C→#243B30 */
+.theme-dark{
+  --bg:#1C2F26; --surface:#243B30; --text:#EAF0E9; --text2:#A6B7AC;
+  --primary:#3FBF9A; --success:#6FCB80; --warning:#D9A93F; --danger:#E28870; --border:#2A3830;
+  --success-tint:#1C2D20; --warning-tint:#2E2718; --danger-tint:#301E1A; --primary-tint:#152420;
+}
+
+/* ---------- browser frame (hero) — unchanged from base ---------- */
+.browser-frame{
+  width:960px; max-width:100%; border-radius:18px; overflow:hidden;
+  border:1px solid var(--border); box-shadow:0 18px 40px -18px rgba(20,30,20,.25);
+  background:var(--bg);
+}
+.browser-chrome{
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.dots{display:flex; gap:6px;}
+.dots span{width:10px; height:10px; border-radius:50%; background:var(--border);}
+.addr{flex:1; background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:12px; color:var(--text2);}
+
+.app{padding:32px 36px 40px; background:var(--bg);}
+
+/* ---------- topbar / wordmark — center-aligned, larger, penguin mark ---------- */
+.topbar{
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px;
+  padding-bottom:26px; border-bottom:1px solid var(--border); margin-bottom:32px;
+}
+/* CHANGE B: light plate behind the wordmark lockup, fixed cream tone in both themes */
+.wordmark{
+  grid-column:2; display:flex; align-items:center; gap:16px; justify-self:center;
+  background:#FAF7F0; border-radius:16px; padding:14px 32px;
+  box-shadow:0 1px 0 rgba(30,42,34,.05) inset, 0 8px 20px -14px rgba(20,30,20,.3);
+}
+.mark{width:60px; height:60px; flex:none; display:flex; align-items:center; justify-content:center;}
+.word{font-family:Georgia,"Iowan Old Style",serif; font-size:32px; letter-spacing:.01em; color:#1E2A22; text-align:center;}
+.tagline{font-size:12px; color:#6b7a70; letter-spacing:.04em; margin-top:3px; text-align:center;}
+.owner-chip{grid-column:3; justify-self:end; display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text2);}
+.owner-chip .av{width:32px; height:32px; border-radius:50%; background:var(--primary-tint); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; font-family:Georgia,serif;}
+
+.section-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:20px;}
+.section-head h2{font-family:Georgia,"Iowan Old Style",serif; font-size:21px; margin:0 0 4px; color:var(--text); font-weight:400;}
+.section-head p{margin:0; font-size:13px; color:var(--text2);}
+
+.btn{
+  border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:600;
+  border-radius:999px; padding:11px 22px; display:inline-flex; align-items:center; gap:8px;
+  transition:box-shadow .18s ease, transform .18s ease;
+}
+.btn-primary{background:var(--primary); color:#fff;}
+.btn-primary:hover{box-shadow:0 6px 18px -6px var(--primary); transform:translateY(-1px);}
+.btn-icon{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--surface);
+  color:var(--text2); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:border-color .18s ease, color .18s ease;
+}
+.btn-icon:hover{border-color:var(--primary); color:var(--primary);}
+
+.tenant-card{background:var(--surface); border:1px solid var(--border); border-radius:18px; overflow:hidden;}
+.tenant-row{
+  display:grid; grid-template-columns:auto 1.6fr 1fr 1fr auto; align-items:center; gap:18px;
+  padding:20px 24px; border-bottom:1px solid var(--border); position:relative;
+}
+.tenant-row:last-child{border-bottom:none;}
+.tenant-row:hover{background:var(--primary-tint);}
+.tenant-row:hover .name::after{transform:scaleX(1);}
+
+/* ---------- tenant avatar — flat color circle + person icon (unchanged) ---------- */
+.avatar{
+  width:52px; height:52px; border-radius:50%; background:var(--primary);
+  display:flex; align-items:center; justify-content:center; overflow:hidden; flex:none;
+}
+.avatar svg{width:28px; height:28px; fill:var(--surface);}
+
+.who .name{font-size:15px; font-weight:600; color:var(--text); position:relative; display:inline-block;}
+.who .name::after{content:""; position:absolute; left:0; bottom:-3px; width:100%; height:1px; background:var(--primary); transform:scaleX(0); transform-origin:left; transition:transform .25s ease;}
+.who .unit{font-size:13px; color:var(--text2); margin-top:3px;}
+.rent{font-size:15px; color:var(--text); font-variant-numeric:tabular-nums;}
+.rent .per{font-size:12px; color:var(--text2);}
+.badge{display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; font-size:12.5px; font-weight:600;}
+.badge svg{width:13px; height:13px;}
+.badge.completed{background:var(--success-tint); color:var(--success);}
+.badge.pending{background:var(--warning-tint); color:var(--warning);}
+.badge.invited{background:var(--primary-tint); color:var(--primary);}
+.actions{display:flex; gap:8px; justify-content:flex-end;}
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Refinement Confirmation — Verandah Ledger (v2)</h1>
+<p class="rationale">Landlord dashboard hero screen, refined per three additional decisions on top of the prior refinement: the seal/monogram mark is replaced with a flat penguin-silhouette medallion; the centered title+logo lockup now sits on a warm cream plate in both light and dark mode; and dark-mode background/surface tokens are lightened from near-black to a more comfortable deep-emerald register. Tenant row content, avatars, spacing, radii and hover behavior are unchanged.</p>
+
+<div class="section-label">Hero — Landlord Dashboard · Light</div>
+<div class="browser-frame theme-light">
+  <div class="browser-chrome">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="addr">residentportal.app/dashboard</div>
+  </div>
+  <div class="app">
+    <div class="topbar">
+      <div></div>
+      <div class="wordmark">
+        <div class="mark">
+          <svg viewBox="0 0 60 60" width="60" height="60" aria-hidden="true">
+            <circle cx="30" cy="30" r="28" fill="var(--surface)" stroke="var(--warning)" stroke-width="1.5"/>
+            <ellipse cx="30" cy="44" rx="8.5" ry="3" fill="var(--primary)" opacity=".14"/>
+            <path d="M30 12c6.4 0 9.6 5.4 9.6 11.6 0 3-.7 5.1-1.4 7.3-.9 2.8-1.6 5.6-1.6 10.4 0 3.6-2.9 6.2-6.6 6.2s-6.6-2.6-6.6-6.2c0-4.8-.7-7.6-1.6-10.4-.7-2.2-1.4-4.3-1.4-7.3C20.4 17.4 23.6 12 30 12z" fill="var(--primary)"/>
+            <path d="M30 17.2c3.6 0 5.6 3 5.9 6.7.2 2.6-.5 4.6-1.4 7.1a2.6 2.6 0 0 1-2.4 1.7h-4.2a2.6 2.6 0 0 1-2.4-1.7c-.9-2.5-1.6-4.5-1.4-7.1.3-3.7 2.3-6.7 5.9-6.7z" fill="var(--surface)"/>
+            <path d="M20.6 21.5c-2.6 1.1-4.6 3.1-5.6 6.6-.7 2.4-.2 4 1 4.6 1.3.6 2.8-.2 3.9-2.1 1.1-2 1.6-5.6.7-9.1z" fill="var(--primary)"/>
+            <path d="M39.4 21.5c2.6 1.1 4.6 3.1 5.6 6.6.7 2.4.2 4-1 4.6-1.3.6-2.8-.2-3.9-2.1-1.1-2-1.6-5.6-.7-9.1z" fill="var(--primary)"/>
+            <path d="M25.6 45.6c0 1.8-1.4 2.6-2.9 3.4-1 .5-1.9 1.6-1.1 2.5.9 1 2.9.6 4.3-.3 1.2-.8 2-2 2-3.4z" fill="var(--warning)"/>
+            <path d="M34.4 45.6c0 1.8 1.4 2.6 2.9 3.4 1 .5 1.9 1.6 1.1 2.5-.9 1-2.9.6-4.3-.3-1.2-.8-2-2-2-3.4z" fill="var(--warning)"/>
+            <circle cx="27.4" cy="24.6" r="1.3" fill="var(--surface)"/>
+            <circle cx="32.6" cy="24.6" r="1.3" fill="var(--surface)"/>
+          </svg>
+        </div>
+        <div>
+          <div class="word">Resident Portal</div>
+          <div class="tagline">Proprietor-managed residences</div>
+        </div>
+      </div>
+      <div class="owner-chip"><div class="av">PV</div> Prasenna Venkatesh</div>
+    </div>
+
+    <div class="section-head">
+      <div>
+        <h2>Tenants</h2>
+        <p>4 residences under management</p>
+      </div>
+      <button class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add tenant
+      </button>
+    </div>
+
+    <div class="tenant-card">
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Ramesh Kumar</div><div class="unit">Unit 2B</div></div>
+        <div class="rent">₹18,500 <span class="per">/mo</span></div>
+        <div><span class="badge pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Pending</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Anita Sharma</div><div class="unit">Unit 1A</div></div>
+        <div class="rent">₹22,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Vikram Nair</div><div class="unit">Unit 3C</div></div>
+        <div class="rent">₹15,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Suresh Iyer</div><div class="unit">Unit 4B</div></div>
+        <div class="rent">₹20,000 <span class="per">/mo</span></div>
+        <div><span class="badge invited"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>Invited · Pending activation</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Resend invitation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></div>
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">Hero — Landlord Dashboard · Dark</div>
+<div class="browser-frame theme-dark">
+  <div class="browser-chrome">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="addr">residentportal.app/dashboard</div>
+  </div>
+  <div class="app">
+    <div class="topbar">
+      <div></div>
+      <div class="wordmark">
+        <div class="mark">
+          <svg viewBox="0 0 60 60" width="60" height="60" aria-hidden="true">
+            <circle cx="30" cy="30" r="28" fill="var(--surface)" stroke="var(--warning)" stroke-width="1.5"/>
+            <ellipse cx="30" cy="44" rx="8.5" ry="3" fill="var(--primary)" opacity=".14"/>
+            <path d="M30 12c6.4 0 9.6 5.4 9.6 11.6 0 3-.7 5.1-1.4 7.3-.9 2.8-1.6 5.6-1.6 10.4 0 3.6-2.9 6.2-6.6 6.2s-6.6-2.6-6.6-6.2c0-4.8-.7-7.6-1.6-10.4-.7-2.2-1.4-4.3-1.4-7.3C20.4 17.4 23.6 12 30 12z" fill="var(--primary)"/>
+            <path d="M30 17.2c3.6 0 5.6 3 5.9 6.7.2 2.6-.5 4.6-1.4 7.1a2.6 2.6 0 0 1-2.4 1.7h-4.2a2.6 2.6 0 0 1-2.4-1.7c-.9-2.5-1.6-4.5-1.4-7.1.3-3.7 2.3-6.7 5.9-6.7z" fill="var(--surface)"/>
+            <path d="M20.6 21.5c-2.6 1.1-4.6 3.1-5.6 6.6-.7 2.4-.2 4 1 4.6 1.3.6 2.8-.2 3.9-2.1 1.1-2 1.6-5.6.7-9.1z" fill="var(--primary)"/>
+            <path d="M39.4 21.5c2.6 1.1 4.6 3.1 5.6 6.6.7 2.4.2 4-1 4.6-1.3.6-2.8-.2-3.9-2.1-1.1-2-1.6-5.6-.7-9.1z" fill="var(--primary)"/>
+            <path d="M25.6 45.6c0 1.8-1.4 2.6-2.9 3.4-1 .5-1.9 1.6-1.1 2.5.9 1 2.9.6 4.3-.3 1.2-.8 2-2 2-3.4z" fill="var(--warning)"/>
+            <path d="M34.4 45.6c0 1.8 1.4 2.6 2.9 3.4 1 .5 1.9 1.6 1.1 2.5-.9 1-2.9.6-4.3-.3-1.2-.8-2-2-2-3.4z" fill="var(--warning)"/>
+            <circle cx="27.4" cy="24.6" r="1.3" fill="var(--surface)"/>
+            <circle cx="32.6" cy="24.6" r="1.3" fill="var(--surface)"/>
+          </svg>
+        </div>
+        <div>
+          <div class="word">Resident Portal</div>
+          <div class="tagline">Proprietor-managed residences</div>
+        </div>
+      </div>
+      <div class="owner-chip"><div class="av">PV</div> Prasenna Venkatesh</div>
+    </div>
+
+    <div class="section-head">
+      <div><h2>Tenants</h2><p>4 residences under management</p></div>
+      <button class="btn btn-primary"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add tenant</button>
+    </div>
+
+    <div class="tenant-card">
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Ramesh Kumar</div><div class="unit">Unit 2B</div></div>
+        <div class="rent">₹18,500 <span class="per">/mo</span></div>
+        <div><span class="badge pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>Pending</span></div>
+        <div class="actions"><div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Anita Sharma</div><div class="unit">Unit 1A</div></div>
+        <div class="rent">₹22,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Vikram Nair</div><div class="unit">Unit 3C</div></div>
+        <div class="rent">₹15,000 <span class="per">/mo</span></div>
+        <div><span class="badge completed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Completed</span></div>
+        <div class="actions"><div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div></div>
+      </div>
+      <div class="tenant-row">
+        <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.2C4 15.7 7.6 13 12 13s8 2.7 8 7.2c0 .4-.4.8-.8.8H4.8c-.4 0-.8-.4-.8-.8z"/></svg></div>
+        <div class="who"><div class="name">Suresh Iyer</div><div class="unit">Unit 4B</div></div>
+        <div class="rent">₹20,000 <span class="per">/mo</span></div>
+        <div><span class="badge invited"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>Invited · Pending activation</span></div>
+        <div class="actions">
+          <div class="btn-icon" title="Resend invitation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></div>
+          <div class="btn-icon" title="Edit contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
