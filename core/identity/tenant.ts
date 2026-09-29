@@ -102,6 +102,10 @@ export async function addTenant(
  * Only ever touches the on-file record via the repository port -- never
  * Better Auth's own user/account tables -- so an already-activated
  * tenant's login identifier is unaffected by this edit.
+ *
+ * Ended tenancies (CAP-8) are read-only: the repository write is
+ * conditional on an active lease and returns a `LEASE_ENDED` error
+ * ("Tenancy has ended.") otherwise, including when racing End.
  */
 export async function updateTenantContact(
   repository: RepositoryPort,

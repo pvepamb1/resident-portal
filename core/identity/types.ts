@@ -57,6 +57,10 @@ export interface Lease {
   /** Rent amount in paise (integer) to avoid floating-point money bugs. */
   rentAmountPaise: number;
   status: LeaseStatus;
+  /** When the tenancy was ended (CAP-8) -- the moment of the action, not the move-out date (`endDate`). */
+  endedAt: Date | null;
+  /** Landlord id that ended the tenancy (CAP-8 audit). */
+  endedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

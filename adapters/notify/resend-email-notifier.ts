@@ -31,6 +31,15 @@ export function createResendEmailNotifier(config: ResendEmailNotifierConfig): No
           subject: message.subject,
           html: message.html,
           text: message.text,
+          ...(message.attachments
+            ? {
+                attachments: message.attachments.map((attachment) => ({
+                  filename: attachment.filename,
+                  content: attachment.content,
+                  contentType: attachment.contentType,
+                })),
+              }
+            : {}),
         });
         if (error) {
           return err({ code: 'NOTIFY_EMAIL_FAILED', message: error.message, cause: error });

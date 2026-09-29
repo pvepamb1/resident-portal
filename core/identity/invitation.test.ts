@@ -42,7 +42,7 @@ describe('resendInvitation', () => {
 
     const result = await resendInvitation(
       { repository, notifier, appBaseUrl: 'https://example.com' },
-      fakeTenant({ invitationStatus: 'active' }),
+      { tenant: fakeTenant({ invitationStatus: 'active' }), lease: { status: 'active' } },
     );
 
     expect(result).toEqual(ok({ kind: 'already_active' }));
@@ -63,7 +63,7 @@ describe('resendInvitation', () => {
 
     const result = await resendInvitation(
       { repository, notifier, appBaseUrl: 'https://example.com' },
-      fakeTenant({ invitationStatus: 'pending' }),
+      { tenant: fakeTenant({ invitationStatus: 'pending' }), lease: { status: 'active' } },
     );
 
     expect(result).toEqual(ok({ kind: 'sent' }));
@@ -89,10 +89,45 @@ describe('resendInvitation', () => {
 
     const result = await resendInvitation(
       { repository, notifier, appBaseUrl: 'https://example.com' },
-      fakeTenant({ invitationStatus: 'pending' }),
+      { tenant: fakeTenant({ invitationStatus: 'pending' }), lease: { status: 'active' } },
     );
 
     expect(result.ok).toBe(false);
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('issues no token when the lease has already ended', async () => {
+    const invalidatePendingInvitationTokens = vi.fn();
+    const createInvitationToken = vi.fn();
+    const sendEmail = vi.fn();
+    const repository = { invalidatePendingInvitationTokens, createInvitationToken } as unknown as RepositoryPort;
+    const notifier = { sendEmail, sendSms: vi.fn() } as unknown as Notifier;
+
+    const result = await resendInvitation(
+      { repository, notifier, appBaseUrl: 'https://example.com' },
+      { tenant: fakeTenant(), lease: { status: 'ended' } },
+    );
+
+    expect(result).toEqual(ok({ kind: 'lease_ended' }));
+    expect(createInvitationToken).not.toHaveBeenCalled();
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('reports lease_ended and sends nothing when End wins the race at token creation', async () => {
+    const repository = {
+      invalidatePendingInvitationTokens: vi.fn(async () => ok(undefined)),
+      createInvitationToken: vi.fn(async () => err({ code: 'LEASE_ENDED', message: 'Tenancy has ended.' })),
+    } as unknown as RepositoryPort;
+    const sendEmail = vi.fn();
+    const notifier = { sendEmail, sendSms: vi.fn() } as unknown as Notifier;
+
+    // Snapshot still says active -- the conditional insert is the real guard.
+    const result = await resendInvitation(
+      { repository, notifier, appBaseUrl: 'https://example.com' },
+      { tenant: fakeTenant(), lease: { status: 'active' } },
+    );
+
+    expect(result).toEqual(ok({ kind: 'lease_ended' }));
     expect(sendEmail).not.toHaveBeenCalled();
   });
 });

@@ -1,10 +1,18 @@
 import type { Result } from './result';
 
+export interface EmailAttachment {
+  filename: string;
+  content: string | Buffer;
+  contentType: string;
+}
+
 export interface EmailMessage {
   to: string;
   subject: string;
   html: string;
   text?: string;
+  /** Any failure to deliver an attachment fails the whole send. Never log attachment content. */
+  attachments?: EmailAttachment[];
 }
 
 export interface SmsMessage {

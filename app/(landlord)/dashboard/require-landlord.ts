@@ -21,16 +21,20 @@ import type { Landlord } from '@/core/identity/types';
  * of each doing its own. Server actions are separate requests/invocations
  * and always get a fresh check, which is intentional (see above).
  */
-export const requireLandlord = cache(async (): Promise<Landlord> => {
+export const requireLandlordSession = cache(async (): Promise<{ landlord: Landlord; authUserId: string }> => {
   const identityResult = await authPort.getIdentityFromHeaders(await headers());
   const identity = identityResult.ok ? identityResult.value : null;
 
   const allowlist = loadLandlordAllowlistFromEnv();
   const accessResult = await resolveLandlordAccess(drizzleRepository, identity, allowlist);
 
-  if (!accessResult.ok || accessResult.value.kind === 'denied') {
+  if (!identity || !accessResult.ok || accessResult.value.kind === 'denied') {
     redirect('/login?error=not_authorized');
   }
 
-  return accessResult.value.landlord;
+  return { landlord: accessResult.value.landlord, authUserId: identity.userId };
 });
+
+export async function requireLandlord(): Promise<Landlord> {
+  return (await requireLandlordSession()).landlord;
+}
