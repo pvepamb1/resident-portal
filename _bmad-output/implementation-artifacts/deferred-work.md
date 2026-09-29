@@ -7,3 +7,6 @@
 - source_spec: `_bmad-output/specs/spec-tenant-portal/stories/2-end-tenancy-and-revoke-access.md`
   summary: Dashboard current/past tenancy split has no rendering test.
   evidence: vitest includes only `*.test.ts`; server-side guards already refuse writes on ended tenancies, so the gap is display-only.
+- source_spec: none
+  summary: Phone+OTP sign-in via MSG91 is deferred until TRAI DLT registration (sender ID + OTP template) is done, after which the adapter must switch from free-text SMS to MSG91's DLT template API.
+  evidence: Indian carriers drop business SMS not sent from a DLT-registered sender and template; DLT registration needs business-entity documents and days of approval. The current adapter (adapters/notify/msg91-sms-notifier.ts) sends free text via route=4. Google OAuth and email magic link cover landlord and tenant sign-in meanwhile. Decided 2026-09-29.
