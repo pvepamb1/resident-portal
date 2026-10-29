@@ -19,6 +19,13 @@ import { createNotifierFromEnv } from '@/adapters/notify';
  * stateless self-contained token. That satisfies AD-6's requirement for a
  * session shape capable of live server-side revocation, so no JWT plugin is
  * used anywhere in this system.
+ *
+ * DO NOT enable `session.cookieCache` and DO NOT add the JWT plugin (AD-6).
+ * Ending a tenancy revokes access by deleting the tenant's `session` rows
+ * (adapters/db/repository.ts `endLease`); that only takes effect on the
+ * next request because Better Auth re-reads the session from the DB every
+ * time. A cookie cache or self-contained token would keep a revoked tenant
+ * signed in until it expired.
  */
 
 const notifier = createNotifierFromEnv();

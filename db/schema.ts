@@ -69,6 +69,13 @@ export const leases = pgTable('leases', {
   /** Rent amount in paise (integer) -- avoids floating-point money bugs. */
   rentAmountPaise: integer('rent_amount_paise').notNull(),
   status: leaseStatus('status').notNull().default('active'),
+  /**
+   * When the "End tenancy" action ran (CAP-8) -- distinct from `endDate`,
+   * which is the landlord-chosen move-out date. Null while active.
+   */
+  endedAt: timestamp('ended_at', { withTimezone: true }),
+  /** The landlord who ended the tenancy (audit). Null while active. */
+  endedBy: uuid('ended_by').references(() => landlords.id),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -82,3 +89,28 @@ export const invitationTokens = pgTable('invitation_tokens', {
   usedAt: timestamp('used_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * CAP-8 / AD-6 point-in-time payment-history snapshot, one per lease
+ * (unique `lease_id`), generated once and never regenerated.
+ *
+ * Reserve-first: the row (key + generatedAt) is inserted before the object
+ * is uploaded; `uploadedAt` is set only once the object exists in storage.
+ * Every racing writer converges on the same key and `generatedAt`, so they
+ * write byte-identical content to the same key -- no orphaned objects.
+ *
+ * `objectKey` must stay recorded here: it is the only way to locate (and
+ * delete) the object on a future DPDP deletion request (SPEC open question
+ * on retention). Do not optimize it away.
+ */
+export const tenancyExports = pgTable('tenancy_exports', {
+  id: uuid('id').primaryKey().default(uuidv7),
+  leaseId: uuid('lease_id').notNull().references(() => leases.id, { onDelete: 'cascade' }),
+  /** `tenancy-exports/<random 32-hex>.csv` -- carries no personal data. */
+  objectKey: text('object_key').notNull(),
+  generatedAt: timestamp('generated_at', { withTimezone: true }).notNull().defaultNow(),
+  uploadedAt: timestamp('uploaded_at', { withTimezone: true }),
+  lastSentAt: timestamp('last_sent_at', { withTimezone: true }),
+}, (table) => [
+  uniqueIndex('tenancy_exports_lease_id_unique').on(table.leaseId),
+]);

@@ -29,6 +29,18 @@
     load-bearing part, not just wiring up three sign-in buttons.
   spec_checkpoint: true
   done_checkpoint: true
+  invoke_dev_with: >-
+    Story 2 (CAP-8) obligations: `resolveTenantAccess` in
+    core/tenancy/access.ts is the access guarantee -- End's session
+    deletion only shortens the window. Call it both at identity resolution
+    and on every tenant request; on `revoked`, delete the new session (this
+    also covers magic links/OTPs issued before End, whose `verification`
+    rows are not cleared). Consume invitation tokens with a statement
+    conditional on an active lease (see createInvitationToken's FOR SHARE
+    pattern in adapters/db/repository.ts). Never link the allowlisted
+    landlord's auth user to a tenant. Revoking one auth user logs them out
+    of every tenancy linked to that user -- acceptable while only one
+    tenant maps to a user. Never enable Better Auth cookieCache or JWT.
 
 - id: "4"
   title: Payment history and lease documents

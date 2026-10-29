@@ -2,7 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import type { RepositoryPort } from '@/ports/repository';
 import type { Notifier } from '@/ports/notifier';
 import { ok, type Result } from '@/ports/result';
-import type { InvitationToken, Tenant } from './types';
+import type { InvitationToken, Lease, Tenant } from './types';
 import { buildInvitationEmail } from './invitation-email';
 
 /**
@@ -50,24 +50,34 @@ export async function issueInvitationToken(
   return ok({ token, record: created.value });
 }
 
-export type ResendInvitationOutcome = { kind: 'sent' } | { kind: 'already_active' };
+export type ResendInvitationOutcome = { kind: 'sent' } | { kind: 'already_active' } | { kind: 'lease_ended' };
 
 /**
  * Resend logic per the I/O matrix:
  * - pending tenant: new token issued (old invalidated), invitation re-sent.
  * - already-activated tenant: no-op, with a clear reason surfaced to the
  *   caller -- not a silent no-op.
+ * - ended tenancy (CAP-8): no token issued. The snapshot check here is only
+ *   a fast path; the real guard is `createInvitationToken`, which only
+ *   inserts while the lease is active (so a resend racing End loses).
  */
 export async function resendInvitation(
   deps: { repository: RepositoryPort; notifier: Notifier; appBaseUrl: string },
-  tenant: Tenant,
+  tenancy: { tenant: Tenant; lease: Pick<Lease, 'status'> },
 ): Promise<Result<ResendInvitationOutcome>> {
+  const { tenant } = tenancy;
+  if (tenancy.lease.status === 'ended') {
+    return ok({ kind: 'lease_ended' });
+  }
   if (tenant.invitationStatus === 'active') {
     return ok({ kind: 'already_active' });
   }
 
   const issued = await issueInvitationToken(deps.repository, tenant.id);
-  if (!issued.ok) return issued;
+  if (!issued.ok) {
+    if (issued.error.code === 'LEASE_ENDED') return ok({ kind: 'lease_ended' });
+    return issued;
+  }
 
   const email = buildInvitationEmail({ tenant, token: issued.value.token, appBaseUrl: deps.appBaseUrl });
   const sent = await deps.notifier.sendEmail({ to: tenant.email, ...email });

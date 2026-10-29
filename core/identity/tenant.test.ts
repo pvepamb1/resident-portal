@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { RepositoryPort } from '@/ports/repository';
 import type { EmailMessage, Notifier } from '@/ports/notifier';
-import { ok } from '@/ports/result';
+import { err, ok } from '@/ports/result';
 import type { NewTenantInput, Tenant, TenantWithLease } from './types';
 import { addTenant, updateTenantContact } from './tenant';
 
@@ -28,6 +28,8 @@ function fakeTenantWithLease(): TenantWithLease {
       endDate: null,
       rentAmountPaise: 5_000_000,
       status: 'active',
+      endedAt: null,
+      endedBy: null,
       createdAt: now,
       updatedAt: now,
     },
@@ -175,5 +177,15 @@ describe('updateTenantContact (I/O matrix: update tenant contact info)', () => {
     if (result.ok) {
       expect(result.value.authUserId).toBe('auth-user-1');
     }
+  });
+
+  it('surfaces LEASE_ENDED from the repository when the tenancy has ended', async () => {
+    const repository = {
+      updateTenantContact: vi.fn(async () => err({ code: 'LEASE_ENDED', message: 'Tenancy has ended.' })),
+    } as unknown as RepositoryPort;
+
+    const result = await updateTenantContact(repository, 'tenant-1', { name: 'Someone' });
+
+    expect(result).toEqual(err({ code: 'LEASE_ENDED', message: 'Tenancy has ended.' }));
   });
 });

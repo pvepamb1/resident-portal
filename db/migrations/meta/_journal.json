@@ -15,6 +15,13 @@
       "when": 1790004131308,
       "tag": "0001_material_wither",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790653092646,
+      "tag": "0002_flaky_omega_sentinel",
+      "breakpoints": true
     }
   ]
 }
